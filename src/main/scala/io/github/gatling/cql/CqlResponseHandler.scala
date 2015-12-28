@@ -25,7 +25,6 @@ package io.github.gatling.cql
 import com.datastax.driver.core.ResultSet
 import com.datastax.driver.core.Statement
 import com.google.common.util.concurrent.FutureCallback
-import com.typesafe.scalalogging.StrictLogging
 import akka.actor._
 import io.gatling.core.result.message._
 import io.gatling.core.result.writer.DataWriterClient
@@ -33,8 +32,9 @@ import io.gatling.core.session.Session
 import io.gatling.core.util.TimeHelper.nowMillis
 import io.gatling.core.validation._
 import com.typesafe.scalalogging.StrictLogging
+import io.github.gatling.CqlProcessed
 
-class CqlResponseHandler(next: ActorRef, session: Session, start: Long, tag: String, stmt: Statement, checks: List[CqlCheck])
+class CqlResponseHandler(next: ActorRef, session: Session, start: Long, tag: String, stmt: Statement, checks: List[CqlCheck], postProcessors: List[CqlPostProcess])
   extends FutureCallback[ResultSet]
   with DataWriterClient
   with StrictLogging {
@@ -48,9 +48,11 @@ class CqlResponseHandler(next: ActorRef, session: Session, start: Long, tag: Str
         case _ => None
       }
     }
+    val end = nowMillis
     if(checkFailures.isEmpty) {
         writeData(OK, None)
-        next ! session.markAsSucceeded
+        val sess = postProcessors.foldRight(session)((proc, sess) => proc.apply(CqlProcessed(sess, tag, stmt, result, start, end)))
+        next ! sess.markAsSucceeded
     } else {
         val errors = checkFailures.mkString("\n")
         logger.error(errors)

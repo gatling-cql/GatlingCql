@@ -23,9 +23,13 @@
 
 package io.github.gatling
 
+import io.gatling.core.session.Session
 import io.gatling.core.validation.Validation
-import com.datastax.driver.core.ResultSet
+import com.datastax.driver.core.{Statement, ResultSet}
 
 package object cql {
   type CqlCheck = ResultSet => Validation[Boolean]
+  type CqlPostProcess = CqlProcessed => Session
 }
+
+case class CqlProcessed(session: Session, tag: String, stmt: Statement, result: ResultSet, requestStartDate: Long, requestEndDate: Long)

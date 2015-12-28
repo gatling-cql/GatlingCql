@@ -55,7 +55,7 @@ class CqlRequestAction(val next: ActorRef, protocol: CqlProtocol, attr: CqlAttri
     stmt.map{ stmt =>
       stmt.setConsistencyLevel(attr.cl)
       val result = protocol.session.executeAsync(stmt)
-      Futures.addCallback(result, new CqlResponseHandler(next, session, start, attr.tag, stmt, attr.checks), CqlRequestAction.executor)
+      Futures.addCallback(result, new CqlResponseHandler(next, session, start, attr.tag, stmt, attr.checks, attr.postProcessors), CqlRequestAction.executor)
     }
   }
 }

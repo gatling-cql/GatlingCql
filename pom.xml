@@ -12,6 +12,7 @@
 		<encoding>UTF-8</encoding>
 		<scala.version>2.11.7</scala.version>
 		<gatling.version>2.1.7</gatling.version>
+		<cassandra-driver.version>2.1.8</cassandra-driver.version>
 	</properties>
 
 	<dependencies>
@@ -24,7 +25,7 @@
 		<dependency>
 			<groupId>com.datastax.cassandra</groupId>
 			<artifactId>cassandra-driver-core</artifactId>
-			<version>2.1.8</version>
+			<version>${cassandra-driver.version}</version>
 			<exclusions>
 				<!-- Provided by Gatling -->
 				<exclusion>
