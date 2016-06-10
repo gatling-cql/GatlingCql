@@ -67,6 +67,14 @@ class CqlCompileTest extends Simulation {
           } else {
             Success(true)
           }
+        }
+        .postProcess {
+          param => {
+            if (!param.result.isExhausted)
+              param.session.set("row-of-" + param.tag, param.result.one().getInt("num"))
+            else
+              param.session
+          }
         })
     .exec(cql("prepared INSERT")
         .execute(prepared)
