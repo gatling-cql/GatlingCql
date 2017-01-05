@@ -79,4 +79,9 @@ Installation
 More Information
 ----------------
 * http://gatling.io/docs/2.2.1/quickstart.html
-* http://gatling.io/docs/2.2.1/cheat-sheet.html
+* http://gatling.io//#/cheat-sheet/2.2.1
+
+
+Example Project
+----------------
+* https://github.com/iNeedCode/cassandra-gatling
