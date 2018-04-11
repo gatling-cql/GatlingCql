@@ -1,0 +1,8 @@
+title: GatlingCql
+description: Gatling support for Apache Cassandra CQL
+google_analytics: UA-54902747-1
+show_downloads: true
+theme: jekyll-theme-tactile
+
+gems:
+  - jekyll-mentions
