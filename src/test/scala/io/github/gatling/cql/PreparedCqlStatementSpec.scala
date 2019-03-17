@@ -25,13 +25,13 @@ package io.github.gatling.cql
 import org.scalatest.FlatSpec
 import org.scalatest.BeforeAndAfter
 import org.scalatest.Matchers
-import org.scalatest.mock.EasyMockSugar
 import com.datastax.driver.core.BoundStatement
 import com.datastax.driver.core.PreparedStatement
 import io.gatling.commons.validation._
 import io.gatling.core.session.el.ElCompiler
 import io.gatling.core.session.Session
 import org.easymock.EasyMock._
+import org.scalatestplus.easymock.EasyMockSugar
 
 class PreparedCqlStatementSpec extends FlatSpec with EasyMockSugar with Matchers with BeforeAndAfter {
   val e1 = ElCompiler.compile[AnyRef]("${foo}")
@@ -44,7 +44,7 @@ class PreparedCqlStatementSpec extends FlatSpec with EasyMockSugar with Matchers
   }
 
   "BoundCqlStatement" should "correctly bind values to a prepared statement" in {
-    val session = new Session("name", 1, Map("foo" -> Integer.valueOf(5), "baz" -> "BaZ"))
+    val session = new Session("name", 1, System.currentTimeMillis, Map("foo" -> Integer.valueOf(5), "baz" -> "BaZ"))
     expecting {
       prepared.bind(Integer.valueOf(5), "BaZ").andReturn(mock[BoundStatement])
     }
@@ -54,12 +54,12 @@ class PreparedCqlStatementSpec extends FlatSpec with EasyMockSugar with Matchers
   }
 
   it should "fail if the expression is wrong and return the 1st error" in {
-    val session = new Session("name", 1, Map("fu" -> Integer.valueOf(5), "buz" -> "BaZ"))
+    val session = new Session("name", 1, System.currentTimeMillis, Map("fu" -> Integer.valueOf(5), "buz" -> "BaZ"))
     target(session) shouldBe "No attribute named 'foo' is defined".failure
   }
 
   it should "handle null parameters correctly" in {
-    val session = new Session("name", 1)
+    val session = new Session("name", 1, System.currentTimeMillis)
     val statementWithNull = BoundCqlStatement(prepared, null)
 
     statementWithNull(session) shouldBe a[Success[_]]

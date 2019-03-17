@@ -30,7 +30,7 @@ import io.gatling.core.util.NameGen
 class CqlRequestActionBuilder(attr: CqlAttributes) extends ActionBuilder with NameGen {
 
   def build(ctx: ScenarioContext, next: Action): Action = {
-    val cqlProtocol = ctx.protocolComponentsRegistry.components(CqlProtocol.CqlProtocolKey).cqlProtocol
-    new CqlRequestAction(genName("CQL:" + attr.tag), next, ctx.system, ctx.coreComponents.statsEngine, cqlProtocol, attr)
+    val cqlComponents = ctx.protocolComponentsRegistry.components(CqlProtocol.CqlProtocolKey)
+    new CqlRequestAction(genName("CQL:" + attr.tag), next, cqlComponents, attr)
   }
 }

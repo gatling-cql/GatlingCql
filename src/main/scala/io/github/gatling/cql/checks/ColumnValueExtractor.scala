@@ -31,18 +31,18 @@ abstract class ColumnValueExtractor[X] extends CriterionExtractor[CqlResponse, A
 
 class SingleColumnValueExtractor(val criterion: String, val occurrence: Int) extends ColumnValueExtractor[Any] with FindArity {
 
-  def extract(prepared: CqlResponse): Validation[Option[Any]] =
+  def apply(prepared: CqlResponse): Validation[Option[Any]] =
     prepared.column(criterion).lift(occurrence).success
 }
 
 class MultipleColumnValueExtractor(val criterion: String) extends ColumnValueExtractor[Seq[Any]] with FindAllArity {
 
-  def extract(prepared: CqlResponse): Validation[Option[Seq[Any]]] =
+  def apply(prepared: CqlResponse): Validation[Option[Seq[Any]]] =
     prepared.column(criterion).liftSeqOption.success
 }
 
 class CountColumnValueExtractor(val criterion: String) extends ColumnValueExtractor[Int] with CountArity {
 
-  def extract(prepared: CqlResponse): Validation[Option[Int]] =
+  def apply(prepared: CqlResponse): Validation[Option[Int]] =
     prepared.column(criterion).liftSeqOption.map(_.size).success
 }

@@ -27,14 +27,12 @@ import io.gatling.commons.validation.{SuccessWrapper, Validation}
 import io.gatling.core.check.extractor.{Extractor, SingleArity}
 import io.gatling.core.check.{FindCheckBuilder, ValidatorCheckBuilder}
 import io.gatling.core.session.{Expression, ExpressionSuccessWrapper}
-
-import io.github.gatling.cql.checks.CqlCheckBuilders._
 import io.github.gatling.cql.response.CqlResponse
 
 class CqlResponseFindCheckBuilder[X](extractor: Expression[Extractor[CqlResponse, X]])
-  extends FindCheckBuilder[CqlCheck, CqlResponse, CqlResponse, X] {
+  extends FindCheckBuilder[CqlCheckType, CqlResponse, X] {
 
-  def find: ValidatorCheckBuilder[CqlCheck, CqlResponse, CqlResponse, X] = ValidatorCheckBuilder(ResponseExtender, PassThroughResponsePreparer, extractor)
+  def find: ValidatorCheckBuilder[CqlCheckType, CqlResponse, X] = ValidatorCheckBuilder(extractor, true)
 }
 
 object CqlCheckBuilder {
@@ -51,7 +49,7 @@ object CqlCheckBuilder {
 
 
   val ResultSetExtractor = new Extractor[CqlResponse, ResultSet] with SingleArity {
-    val name = "executionInfo"
+    val name = "resultSet"
     def apply(prepared: CqlResponse): Validation[Option[ResultSet]] = {
       Some(prepared.resultSet).success
     }
@@ -69,8 +67,6 @@ object CqlCheckBuilder {
   }.expressionSuccess
 
   val RowCount = new CqlResponseFindCheckBuilder[Int](RowCountExtractor)
-
-
 
   val AppliedExtractor = new Extractor[CqlResponse, Boolean] with SingleArity {
     val name = "applied"

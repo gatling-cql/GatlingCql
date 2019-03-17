@@ -36,17 +36,11 @@ object RunGatling extends App
   val mavenResourcesDirectory = projectRootDir / "src" / "test" / "resources"
   val mavenTargetDirectory = projectRootDir / "target"
   val mavenBinariesDirectory = mavenTargetDirectory / "test-classes"
-
-  val dataDirectory = mavenResourcesDirectory / "data"
-  val bodiesDirectory = mavenResourcesDirectory / "bodies"
-
   val resultsDirectory = mavenTargetDirectory / "results"
 
   val props = new GatlingPropertiesBuilder
 
-  props.dataDirectory(dataDirectory.toString)
   props.resultsDirectory(resultsDirectory.toString)
-  props.bodiesDirectory(bodiesDirectory.toString)
   props.binariesDirectory(mavenBinariesDirectory.toString)
 
   props.simulationClass("io.github.gatling.cql.CheckCompileTest")

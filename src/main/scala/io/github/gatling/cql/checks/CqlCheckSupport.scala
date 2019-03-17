@@ -24,11 +24,30 @@ package io.github.gatling.cql.checks
 
 import io.gatling.core.check._
 import io.gatling.core.session.{Expression, RichExpression}
-
-import io.github.gatling.cql.checks.CqlCheckBuilders._
 import io.github.gatling.cql.response.CqlResponse
+import io.gatling.commons.validation.SuccessWrapper
+
+trait CqlCheckType
 
 trait CqlCheckSupport {
+
+  implicit def checkBuilder2CqlCheck[A, P, X](checkBuilder: CheckBuilder[A, P, X])(implicit materializer: CheckMaterializer[A, CqlCheck, CqlResponse, P]): CqlCheck =
+    checkBuilder.build(materializer)
+
+  implicit def validatorCheckBuilder2CqlCheck[A, P, X](validatorCheckBuilder: ValidatorCheckBuilder[A, P, X])(implicit CheckMaterializer: CheckMaterializer[A, CqlCheck, CqlResponse, P]): CqlCheck =
+    validatorCheckBuilder.exists
+
+  implicit def findCheckBuilder2CqlCheck[A, P, X](findCheckBuilder: FindCheckBuilder[A, P, X])(implicit CheckMaterializer: CheckMaterializer[A, CqlCheck, CqlResponse, P]): CqlCheck =
+    findCheckBuilder.find.exists
+
+  implicit def cqlCheckMaterializer = new CheckMaterializer[CqlCheckType, CqlCheck, CqlResponse, CqlResponse] {
+    override protected def preparer: Preparer[CqlResponse, CqlResponse] = _.success
+
+    override protected def specializer: Specializer[CqlCheck, CqlResponse] = identity
+  }
+
+  type CqlCheck = Check[CqlResponse]
+
   val exhausted = CqlCheckBuilder.Exhausted
   val applied = CqlCheckBuilder.Applied
 
@@ -46,7 +65,7 @@ trait CqlCheckSupport {
    * Note that this statement implicitly fetches <b>all</b> rows from the result set!
    */
   def columnValue(columnName: Expression[String]) =
-    new DefaultMultipleFindCheckBuilder[CqlCheck, CqlResponse, CqlResponse, Any](ResponseExtender, PassThroughResponsePreparer) {
+    new DefaultMultipleFindCheckBuilder[CqlCheckType, CqlResponse, Any](true) {
       def findExtractor(occurrence: Int) = columnName.map(new SingleColumnValueExtractor(_, occurrence))
       def findAllExtractor = columnName.map(new MultipleColumnValueExtractor(_))
       def countExtractor = columnName.map(new CountColumnValueExtractor(_))

@@ -69,7 +69,7 @@ class CqlCompileTest extends Simulation {
         .execute("SELECT * FROM test_table WHERE num = ${randomNum}")
         .check(exhausted is false)
         .check(applied is false)
-        .check(columnValue("num").count.greaterThan(1))
+        .check(columnValue("num").count.gt(1))
     )
 
 /*

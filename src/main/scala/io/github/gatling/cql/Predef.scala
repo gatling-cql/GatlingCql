@@ -22,15 +22,4 @@
  */
 package io.github.gatling.cql
 
-import io.gatling.core.action.builder.ActionBuilder
-import io.github.gatling.cql.checks.CqlCheckSupport
-import io.github.gatling.cql.request.{CqlProtocol, CqlProtocolBuilder, CqlRequestBuilder, CqlRequestBuilderBase}
-
-object Predef extends CqlCheckSupport {
-  val cql = CqlProtocolBuilder
-  
-  def cql(tag: String) = CqlRequestBuilderBase(tag)
-  
-  implicit def cqlProtocolBuilder2cqlProtocol(builder: CqlProtocolBuilder): CqlProtocol = builder.build
-  implicit def cqlRequestBuilder2ActionBuilder(builder: CqlRequestBuilder): ActionBuilder = builder.build()
-}
+object Predef extends CqlDsl

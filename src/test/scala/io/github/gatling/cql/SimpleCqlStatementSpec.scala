@@ -33,7 +33,7 @@ class SimpleCqlStatementSpec extends FlatSpec with Matchers {
     val target = SimpleCqlStatement(el)
     
     "SimpleCqlStatement" should "correctly return SimpleStatement for a valid expression" in {
-      val session = new Session("name", 1, Map("test" -> "5"))
+      val session = new Session("name", 1, System.currentTimeMillis, Map("test" -> "5"))
       val result = target(session) 
       result shouldBe a[Success[_]]
       //result.get.getQueryString() shouldBe "select * from test where id = 5"
@@ -41,7 +41,7 @@ class SimpleCqlStatementSpec extends FlatSpec with Matchers {
     }
     
     it should "fail if the expression is wrong" in {
-      val session = new Session("name", 1, Map("test2" -> "5"))
+      val session = new Session("name", 1, System.currentTimeMillis, Map("test2" -> "5"))
       target(session) shouldBe "No attribute named 'test' is defined".failure 
     }
 

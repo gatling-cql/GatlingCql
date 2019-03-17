@@ -58,7 +58,9 @@ case class BoundCqlStatement(statement: PreparedStatement, params: Expression[An
         case Failure(error) => error.failure
       }
       case _ => try {
-        statement.bind(validParsedParams.map(_.get): _*).success
+        Validation.sequence(validParsedParams).flatMap( ps =>
+          statement.bind(ps: _*).success
+        )
       } catch {
         case e: Exception => e.getMessage().failure
       }

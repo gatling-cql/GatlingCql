@@ -23,9 +23,8 @@
 package io.github.gatling.cql.request
 
 import com.datastax.driver.core.ConsistencyLevel
-
 import io.github.gatling.cql.CqlStatement
-import io.github.gatling.cql.checks.CqlCheck
+import io.github.gatling.cql.Predef.CqlCheck
 
 case class CqlAttributes(tag: String, statement: CqlStatement, cl:ConsistencyLevel = ConsistencyLevel.ONE,
                          serialCl:ConsistencyLevel = ConsistencyLevel.SERIAL, checks: List[CqlCheck] = List.empty[CqlCheck])
