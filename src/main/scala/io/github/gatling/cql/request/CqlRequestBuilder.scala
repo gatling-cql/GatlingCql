@@ -25,7 +25,7 @@ package io.github.gatling.cql.request
 import com.datastax.driver.core.{ConsistencyLevel, PreparedStatement}
 import io.gatling.core.action.builder.ActionBuilder
 import io.gatling.core.session.Expression
-import io.github.gatling.cql.Predef.CqlCheck
+import io.github.gatling.cql.checks.CqlCheck
 import io.github.gatling.cql.{BoundCqlStatement, SimpleCqlStatement, SimpleCqlStatementWithParams}
 
 

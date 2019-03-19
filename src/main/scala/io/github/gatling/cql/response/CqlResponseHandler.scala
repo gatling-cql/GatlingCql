@@ -32,7 +32,7 @@ import io.gatling.core.action.Action
 import io.gatling.core.check.Check
 import io.gatling.core.session.Session
 import io.gatling.core.stats.message.ResponseTimings
-import io.github.gatling.cql.Predef.CqlCheck
+import io.github.gatling.cql.checks.CqlCheck
 import io.github.gatling.cql.request.CqlComponents
 
 

@@ -24,22 +24,20 @@ package io.github.gatling.cql.response
 
 import com.datastax.driver.core.{ResultSet, Row}
 
-import scala.collection.JavaConversions._
-
-abstract class Response
+import scala.collection.JavaConverters._
 
 case class CqlResponseBase(resultSet: ResultSet)
 
 class CqlResponse(resultSet: ResultSet) extends CqlResponseBase(resultSet) {
 
   // implicit cache of all rows of the result set
-  private lazy val allRows:Seq[Row] = resultSet.all()
+  private lazy val allRows:Seq[Row] = resultSet.all().asScala
 
   /**
    * Get the number of all rows returned by the CQL statement.
    * Note that this statement implicitly fetches <b>all</b> rows from the result set!
    */
-  def rowCount = allRows.length
+  def rowCount: Int = allRows.length
 
   /**
    * Get a column by name returned by the CQL statement.

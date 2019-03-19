@@ -20,12 +20,11 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.gatling.cql.request
+package io.github.gatling.cql
 
-import com.datastax.driver.core.ConsistencyLevel
-import io.github.gatling.cql.CqlStatement
-import io.github.gatling.cql.checks.CqlCheck
+import io.gatling.core.check.Check
+import io.github.gatling.cql.response.CqlResponse
 
-case class CqlAttributes(tag: String, statement: CqlStatement, cl:ConsistencyLevel = ConsistencyLevel.ONE,
-                         serialCl:ConsistencyLevel = ConsistencyLevel.SERIAL, checks: List[CqlCheck] = List.empty[CqlCheck])
-
+package object checks {
+  type CqlCheck = Check[CqlResponse]
+}

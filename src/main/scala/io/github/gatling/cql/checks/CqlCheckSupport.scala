@@ -23,9 +23,8 @@
 package io.github.gatling.cql.checks
 
 import io.gatling.core.check._
-import io.gatling.core.session.{Expression, RichExpression}
+import io.gatling.commons.validation._
 import io.github.gatling.cql.response.CqlResponse
-import io.gatling.commons.validation.SuccessWrapper
 
 trait CqlCheckType
 
@@ -40,13 +39,11 @@ trait CqlCheckSupport {
   implicit def findCheckBuilder2CqlCheck[A, P, X](findCheckBuilder: FindCheckBuilder[A, P, X])(implicit CheckMaterializer: CheckMaterializer[A, CqlCheck, CqlResponse, P]): CqlCheck =
     findCheckBuilder.find.exists
 
-  implicit def cqlCheckMaterializer = new CheckMaterializer[CqlCheckType, CqlCheck, CqlResponse, CqlResponse] {
-    override protected def preparer: Preparer[CqlResponse, CqlResponse] = _.success
+  implicit val cqlCheckMaterializer = new CheckMaterializer[CqlCheckType, CqlCheck, CqlResponse, CqlResponse] {
+    override protected val preparer: Preparer[CqlResponse, CqlResponse] = _.success
 
-    override protected def specializer: Specializer[CqlCheck, CqlResponse] = identity
+    override protected val specializer: Specializer[CqlCheck, CqlResponse] = identity
   }
-
-  type CqlCheck = Check[CqlResponse]
 
   val exhausted = CqlCheckBuilder.Exhausted
   val applied = CqlCheckBuilder.Applied
@@ -55,21 +52,14 @@ trait CqlCheckSupport {
   val resultSet = CqlCheckBuilder.ResultSet
 
   /**
-   * Get the number of all rows returned by the CQL statement.
-   * Note that this statement implicitly fetches <b>all</b> rows from the result set!
-   */
+    * Get the number of all rows returned by the CQL statement.
+    * Note that this statement implicitly fetches <b>all</b> rows from the result set!
+    */
   val rowCount = CqlCheckBuilder.RowCount
 
-  /**
-   * Get a column by name returned by the CQL statement.
-   * Note that this statement implicitly fetches <b>all</b> rows from the result set!
-   */
-  def columnValue(columnName: Expression[String]) =
-    new DefaultMultipleFindCheckBuilder[CqlCheckType, CqlResponse, Any](true) {
-      def findExtractor(occurrence: Int) = columnName.map(new SingleColumnValueExtractor(_, occurrence))
-      def findAllExtractor = columnName.map(new MultipleColumnValueExtractor(_))
-      def countExtractor = columnName.map(new CountColumnValueExtractor(_))
-    }
+  val columnValue = CqlCheckBuilder.columnValue _
+
+  val simpleCheck = CqlCheckBuilder.simpleCheck _
 
 }
 

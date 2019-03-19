@@ -108,6 +108,9 @@ class CheckCompileTest extends Simulation
               .check(exhausted is false)
               .check(rowCount is 1)
               .check(applied is true)
+              .check(resultSet satisfies { rs => rs.wasApplied })
+              .check(executionInfo satisfies { ei => ei.isSchemaInAgreement })
+              .check(simpleCheck(rs => rs.getExecutionInfo.isSchemaInAgreement))
       )
       .exec(lwtUpdateFailing
               // 2nd LWT operation needs to fail

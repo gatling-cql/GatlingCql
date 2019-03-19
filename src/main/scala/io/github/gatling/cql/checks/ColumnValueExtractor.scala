@@ -27,7 +27,9 @@ import io.gatling.core.check.extractor._
 import io.github.gatling.cql.response.CqlResponse
 
 
-abstract class ColumnValueExtractor[X] extends CriterionExtractor[CqlResponse, Any, X] { val criterionName = "columnValue" }
+abstract class ColumnValueExtractor[X] extends CriterionExtractor[CqlResponse, Any, X] {
+  val criterionName = "columnValue"
+}
 
 class SingleColumnValueExtractor(val criterion: String, val occurrence: Int) extends ColumnValueExtractor[Any] with FindArity {
 
