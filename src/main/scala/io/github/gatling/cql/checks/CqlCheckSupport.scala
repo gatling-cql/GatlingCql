@@ -39,10 +39,8 @@ trait CqlCheckSupport {
   implicit def findCheckBuilder2CqlCheck[A, P, X](findCheckBuilder: FindCheckBuilder[A, P, X])(implicit CheckMaterializer: CheckMaterializer[A, CqlCheck, CqlResponse, P]): CqlCheck =
     findCheckBuilder.find.exists
 
-  implicit val cqlCheckMaterializer = new CheckMaterializer[CqlCheckType, CqlCheck, CqlResponse, CqlResponse] {
+  implicit val cqlCheckMaterializer = new CheckMaterializer[CqlCheckType, CqlCheck, CqlResponse, CqlResponse](identity) {
     override protected val preparer: Preparer[CqlResponse, CqlResponse] = _.success
-
-    override protected val specializer: Specializer[CqlCheck, CqlResponse] = identity
   }
 
   val exhausted = CqlCheckBuilder.Exhausted

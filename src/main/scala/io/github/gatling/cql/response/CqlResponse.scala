@@ -26,9 +26,7 @@ import com.datastax.driver.core.{ResultSet, Row}
 
 import scala.collection.JavaConverters._
 
-case class CqlResponseBase(resultSet: ResultSet)
-
-class CqlResponse(resultSet: ResultSet) extends CqlResponseBase(resultSet) {
+case class CqlResponse(resultSet: ResultSet) {
 
   // implicit cache of all rows of the result set
   private lazy val allRows:Seq[Row] = resultSet.all().asScala

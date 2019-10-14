@@ -22,9 +22,8 @@
  */
 package io.github.gatling.cql
 
-import org.scalatest.FlatSpec
-import org.scalatest.BeforeAndAfter
-import org.scalatest.Matchers
+import org.scalatest._
+import org.scalatest.matchers.should._
 import com.datastax.driver.core.BoundStatement
 import com.datastax.driver.core.PreparedStatement
 import io.gatling.commons.validation._

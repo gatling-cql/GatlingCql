@@ -36,7 +36,8 @@ import io.github.gatling.cql.CqlStatement
 import io.github.gatling.cql.checks.CqlCheck
 import org.easymock.Capture
 import org.easymock.EasyMock.{anyObject, anyString, capture, reset, eq => eqAs}
-import org.scalatest.{BeforeAndAfter, FlatSpec, Matchers}
+import org.scalatest._
+import org.scalatest.matchers.should._
 import org.scalatestplus.easymock.EasyMockSugar
 
 class CqlRequestActionSpec extends FlatSpec with EasyMockSugar with Matchers with BeforeAndAfter {

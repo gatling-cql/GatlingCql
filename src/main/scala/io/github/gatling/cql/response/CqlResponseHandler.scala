@@ -22,6 +22,8 @@
  */
 package io.github.gatling.cql.response
 
+import java.util.{ HashMap => JHashMap }
+
 import com.datastax.driver.core.exceptions.DriverException
 import com.datastax.driver.core.{ResultSet, Statement}
 import com.google.common.util.concurrent.FutureCallback
@@ -51,7 +53,9 @@ class CqlResponseHandler(next: Action, session: Session, cqlComponents: CqlCompo
     val respTimings = ResponseTimings(start, cqlComponents.coreComponents.clock.nowMillis)
 
     cqlComponents.coreComponents.actorSystem.dispatcher.execute(() => {
-      val checkRes: (Session, Option[Failure]) = Check.check(response, session, checks)
+      val preparedCache: JHashMap[Any, Any] = new JHashMap()
+
+      val checkRes: (Session, Option[Failure]) = Check.check(response, session, checks, preparedCache)
 
       if (checkRes._2.isEmpty) {
         writeData(OK, respTimings, None)

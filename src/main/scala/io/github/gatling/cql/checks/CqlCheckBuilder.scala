@@ -25,14 +25,13 @@ package io.github.gatling.cql.checks
 import java.util
 
 import com.datastax.driver.core.{ExecutionInfo, ResultSet}
-import io.gatling.core.session._
 import io.gatling.commons.validation._
-import io.gatling.core.check.extractor.{Extractor, SingleArity}
-import io.gatling.core.check.{CheckResult, DefaultMultipleFindCheckBuilder, FindCheckBuilder, Matcher, Validator, ValidatorCheckBuilder}
+import io.gatling.core.check._
+import io.gatling.core.session._
+import io.github.gatling.cql.checks.CqlExtractors._
 import io.github.gatling.cql.response.CqlResponse
 
-class CqlCheckBuilder[X](extractor: Expression[Extractor[CqlResponse, X]]) extends FindCheckBuilder[CqlCheckType,
-  CqlResponse, X] {
+class CqlCheckBuilder[X](extractor: Expression[CqlExtractor[X]]) extends FindCheckBuilder[CqlCheckType, CqlResponse, X] {
 
   def find: ValidatorCheckBuilder[CqlCheckType, CqlResponse, X] = ValidatorCheckBuilder(extractor, displayActualValue = true)
 
@@ -40,46 +39,6 @@ class CqlCheckBuilder[X](extractor: Expression[Extractor[CqlResponse, X]]) exten
 }
 
 object CqlCheckBuilder {
-
-  private val ExecutionInfoExtractor = new Extractor[CqlResponse, ExecutionInfo] with SingleArity {
-    val name = "executionInfo"
-
-    def apply(prepared: CqlResponse): Validation[Option[ExecutionInfo]] = {
-      Some(prepared.resultSet.getExecutionInfo).success
-    }
-  }.expressionSuccess
-
-  private val ResultSetExtractor = new Extractor[CqlResponse, ResultSet] with SingleArity {
-    val name = "resultSet"
-
-    def apply(prepared: CqlResponse): Validation[Option[ResultSet]] = {
-      Some(prepared.resultSet).success
-    }
-  }.expressionSuccess
-
-  private val RowCountExtractor = new Extractor[CqlResponse, Int] with SingleArity {
-    val name = "rowCount"
-
-    def apply(prepared: CqlResponse): Validation[Option[Int]] = {
-      Some(prepared.rowCount).success
-    }
-  }.expressionSuccess
-
-  private val AppliedExtractor = new Extractor[CqlResponse, Boolean] with SingleArity {
-    val name = "applied"
-
-    def apply(prepared: CqlResponse): Validation[Option[Boolean]] = {
-      Some(prepared.resultSet.wasApplied()).success
-    }
-  }.expressionSuccess
-
-  private val ExhaustedExtractor = new Extractor[CqlResponse, Boolean] with SingleArity {
-    val name = "exhausted"
-
-    def apply(prepared: CqlResponse): Validation[Option[Boolean]] = {
-      Some(prepared.resultSet.isExhausted).success
-    }
-  }.expressionSuccess
 
   private def satisfies[X](predicate: X => Boolean): Expression[Validator[X]] = new Matcher[X] {
     val name = "predicate"
@@ -92,11 +51,11 @@ object CqlCheckBuilder {
     }
   }.expressionSuccess
 
-  val ExecutionInfo = new CqlCheckBuilder[ExecutionInfo](ExecutionInfoExtractor)
-  val ResultSet = new CqlCheckBuilder[ResultSet](ResultSetExtractor)
-  val RowCount = new CqlCheckBuilder[Int](RowCountExtractor)
-  val Applied = new CqlCheckBuilder[Boolean](AppliedExtractor)
-  val Exhausted = new CqlCheckBuilder[Boolean](ExhaustedExtractor)
+  val ExecutionInfo = new CqlCheckBuilder[ExecutionInfo](ExecutionInfoExtractor.expressionSuccess)
+  val ResultSet = new CqlCheckBuilder[ResultSet](ResultSetExtractor.expressionSuccess)
+  val RowCount = new CqlCheckBuilder[Int](RowCountExtractor.expressionSuccess)
+  val Applied = new CqlCheckBuilder[Boolean](AppliedExtractor.expressionSuccess)
+  val Exhausted = new CqlCheckBuilder[Boolean](ExhaustedExtractor.expressionSuccess)
 
   /**
     * Get a column by name returned by the CQL statement.
@@ -104,15 +63,15 @@ object CqlCheckBuilder {
     */
 
   def columnValue(columnName: Expression[String]) = new DefaultMultipleFindCheckBuilder[CqlCheckType, CqlResponse, Any](true) {
-      def findExtractor(occurrence: Int) = columnName.map(new SingleColumnValueExtractor(_, occurrence))
+      override def findExtractor(occurrence: Int) = columnName.map(singleRecordExtractor(_, occurrence))
 
-      def findAllExtractor = columnName.map(new MultipleColumnValueExtractor(_))
+      override def findAllExtractor = columnName.map(allRecordsExtractor)
 
-      def countExtractor = columnName.map(new CountColumnValueExtractor(_))
+      override def countExtractor = columnName.map(countRecordsExtractor)
     }
 
   def simpleCheck(predicate: ResultSet => Boolean): CqlCheck = new CqlCheck {
-    override def check(response: CqlResponse, session: Session)(implicit preparedCache: util.Map[Any, Any]): Validation[CheckResult] = {
+    override def check(response: CqlResponse, session: Session, preparedCache: util.Map[Any, Any]): Validation[CheckResult] = {
       if (predicate(response.resultSet)) CheckResult.NoopCheckResultSuccess
       else "CQL check failed".failure
     }
