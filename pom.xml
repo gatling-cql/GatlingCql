@@ -129,6 +129,7 @@
                         <exclude>src/main/resources/**</exclude>
                         <exclude>**/*.xml</exclude>
                         <exclude>_config.yml</exclude>
+			<exclude>.github/**</exclude>
                     </excludes>
                     <mapping>
                         <scala>SLASHSTAR_STYLE</scala>
