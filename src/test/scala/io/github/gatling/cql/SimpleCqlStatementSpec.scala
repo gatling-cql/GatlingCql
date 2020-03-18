@@ -22,13 +22,13 @@
  */
 package io.github.gatling.cql
 
-import org.scalatest.FlatSpec
-import org.scalatest.Matchers
 import io.gatling.commons.validation._
-import io.gatling.core.session.el.ElCompiler
 import io.gatling.core.session.Session
+import io.gatling.core.session.el.ElCompiler
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class SimpleCqlStatementSpec extends FlatSpec with Matchers {
+class SimpleCqlStatementSpec extends AnyFlatSpec with Matchers {
     val el = ElCompiler.compile[String]("select * from test where id = ${test}")
     val target = SimpleCqlStatement(el)
     

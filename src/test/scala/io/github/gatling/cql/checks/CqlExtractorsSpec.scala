@@ -28,12 +28,13 @@ import io.github.gatling.cql.checks.CqlExtractors._
 import io.github.gatling.cql.response.CqlResponse
 import org.easymock.EasyMock.reset
 import org.scalatest._
+import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should._
 import org.scalatestplus.easymock.EasyMockSugar
 
 import scala.collection.JavaConverters._
 
-class CqlExtractorsSpec extends FlatSpec with EasyMockSugar with Matchers with BeforeAndAfter {
+class CqlExtractorsSpec extends AnyFlatSpec with EasyMockSugar with Matchers with BeforeAndAfter {
 
   val rs: ResultSet = mock[ResultSet]
   val ei: ExecutionInfo = mock[ExecutionInfo]

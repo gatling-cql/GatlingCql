@@ -37,10 +37,11 @@ import io.github.gatling.cql.checks.CqlCheck
 import org.easymock.Capture
 import org.easymock.EasyMock.{anyObject, anyString, capture, reset, eq => eqAs}
 import org.scalatest._
+import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should._
 import org.scalatestplus.easymock.EasyMockSugar
 
-class CqlRequestActionSpec extends FlatSpec with EasyMockSugar with Matchers with BeforeAndAfter {
+class CqlRequestActionSpec extends AnyFlatSpec with EasyMockSugar with Matchers with BeforeAndAfter {
   val config = GatlingConfiguration.loadForTest()
   val cassandraSession = mock[Session]
   val statement = mock[CqlStatement]
