@@ -7,8 +7,8 @@
     <description>Gatling support for Apache Cassandra CQL</description>
 
     <properties>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <encoding>UTF-8</encoding>
         <scala.version>2.12.8</scala.version>
         <gatling.version>3.3.1</gatling.version>
@@ -84,6 +84,16 @@
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
                 <version>4.3.1</version>
+                <configuration>
+                    <args>
+                        <arg>-target:jvm-1.8</arg>
+                        <arg>-deprecation</arg>
+                        <arg>-feature</arg>
+                        <arg>-unchecked</arg>
+                        <arg>-language:implicitConversions</arg>
+                        <arg>-language:postfixOps</arg>
+                    </args>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
@@ -136,7 +146,7 @@
                         <exclude>src/main/resources/**</exclude>
                         <exclude>**/*.xml</exclude>
                         <exclude>_config.yml</exclude>
-			<exclude>.github/**</exclude>
+                        <exclude>.github/**</exclude>
                     </excludes>
                     <mapping>
                         <scala>SLASHSTAR_STYLE</scala>
