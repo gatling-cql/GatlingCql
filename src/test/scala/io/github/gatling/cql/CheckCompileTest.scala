@@ -25,7 +25,7 @@ package io.github.gatling.cql
 
 import java.util.concurrent.atomic.AtomicInteger
 
-import com.datastax.driver.core.Cluster
+import com.datastax.oss.driver.api.core.CqlSession
 import io.gatling.core.Predef._
 import io.gatling.core.scenario.Simulation
 import io.github.gatling.cql.Predef._
@@ -37,9 +37,7 @@ class CheckCompileTest extends Simulation
   val keyspace = "gatlingcql"
   val table_name = "test_table"
 
-  val cluster = Cluster.builder().addContactPoint("127.0.0.1")
-    .build()
-  val session = cluster.connect()
+  val session = CqlSession.builder().build()
 
   session.execute(
     s"""CREATE KEYSPACE IF NOT EXISTS $keyspace
@@ -106,9 +104,9 @@ class CheckCompileTest extends Simulation
       .exec(lwtUpdate
               // LWT operations return a row
               .check(exhausted is false)
-              .check(rowCount is 1)
               .check(applied is true)
               .check(resultSet satisfies { rs => rs.wasApplied })
+              .check(rowCount is 1)
               .check(executionInfo satisfies { ei => ei.isSchemaInAgreement })
               .check(simpleCheck(rs => rs.getExecutionInfo.isSchemaInAgreement))
       )
@@ -118,8 +116,8 @@ class CheckCompileTest extends Simulation
               // because of same timestamps used to compare the cells can be the same - the faster your computer,
               // the higher the probabiltiy ;)
               .check(exhausted is false,
-                     rowCount is 1,
                      applied is false,
+                     rowCount is 1,
                      columnValue("str") is "foobar${sequenceNum}"
               )) // why the LWT update failed
       .exec(select
@@ -140,6 +138,6 @@ class CheckCompileTest extends Simulation
     scn.inject(rampUsersPerSec(10) to 500 during (30 seconds), constantUsersPerSec(500) during(30 seconds))
   ).protocols(cqlConfig)
 
-  after(cluster.close())
+  after(session.close())
 
 }

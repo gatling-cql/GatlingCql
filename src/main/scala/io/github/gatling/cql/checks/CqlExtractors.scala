@@ -22,7 +22,7 @@
  */
 package io.github.gatling.cql.checks
 
-import com.datastax.driver.core.{ExecutionInfo, ResultSet}
+import com.datastax.oss.driver.api.core.cql.{ExecutionInfo, ResultSet}
 import io.gatling.commons.validation._
 import io.gatling.core.check._
 import io.github.gatling.cql.response.CqlResponse
@@ -51,12 +51,12 @@ object CqlExtractors {
 
   private[checks] val AppliedExtractor = new CqlResponseExtractor[Boolean](
     "applied",
-    prepared => Some(prepared.resultSet.wasApplied()).success
+    prepared => safely()(Some(prepared.resultSet.wasApplied()).success)
   )
 
   private[checks] val ExhaustedExtractor = new CqlResponseExtractor[Boolean](
     "exhausted",
-    prepared => Some(prepared.resultSet.isExhausted).success
+    prepared => Some(!prepared.resultSet.iterator().hasNext).success
   )
 
   /* Extract a record from CqlResponse */

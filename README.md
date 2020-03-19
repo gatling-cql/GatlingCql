@@ -12,14 +12,15 @@ Basic Gatling DSL for Apache Cassandra CQL, prepared statements are supported as
 class CassandraSimulation extends Simulation {
   val keyspace = "test"
   val table_name = "test_table"
-  val cluster = Cluster.builder().addContactPoint("127.0.0.1").build()
-  val session = cluster.connect(s"$keyspace") //Your C* session
-  val cqlConfig = cql.session(session) //Initialize Gatling DSL with your session
-
-  //Setup
+  val session = CqlSession.builder().build()//Your C* session
   session.execute(s"""CREATE KEYSPACE IF NOT EXISTS $keyspace 
                       WITH replication = { 'class' : 'SimpleStrategy', 
                                           'replication_factor': '1'}""")
+                                          
+  session.execute(s"USE $keyspace")
+  val cqlConfig = cql.session(session) //Initialize Gatling DSL with your session
+
+  //Setup
   session.execute(s"""CREATE TABLE IF NOT EXISTS $table_name (
           id timeuuid,
           num int,
@@ -51,7 +52,8 @@ class CassandraSimulation extends Simulation {
     .exec(cql("simple SELECT") 
          // 'execute' can accept a string 
          // and understands Gatling expression language (EL), i.e. ${randomNum}
-        .execute("SELECT * FROM test_table WHERE num = ${randomNum}")) 
+        .execute("SELECT * FROM test_table WHERE num = ${randomNum}")
+        .check(rowCount.is(1)))
     .exec(cql("prepared INSERT")
          // alternatively 'execute' accepts a prepared statement
         .execute(prepared)
@@ -64,7 +66,7 @@ class CassandraSimulation extends Simulation {
   setUp(scn.inject(rampUsersPerSec(10) to 100 during (30 seconds)))
     .protocols(cqlConfig)
 
-  after(cluster.close()) // close session and stop associated threads started by the Java/Scala driver
+  after(session.close())
 }
 ```
 
@@ -73,10 +75,10 @@ Installation
 ------------
 
 * Get a release TGZ
-* Unpack into Gatling folder: ``tar -xjf GatlingCql-3.0.0-release.tar.gz -C gatling-charts-highcharts-bundle-3.0.3/``
+* Unpack into Gatling folder: ``tar -xjf GatlingCql-3.3.1-release.tar.gz -C gatling-charts-highcharts-bundle-3.3.1/``
 * Run Gatling and you should see ``cassandra.CassandraSimulation`` in your simulations list
 
 More Information
 ----------------
-* http://gatling.io/docs/3.0/quickstart
-* http://gatling.io/docs/3.0/cheat-sheet
+* http://gatling.io/docs/3.3/quickstart
+* http://gatling.io/docs/3.3/cheat-sheet

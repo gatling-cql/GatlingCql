@@ -22,27 +22,27 @@
  */
 package io.github.gatling.cql
 
-import com.datastax.driver.core.PreparedStatement
-import com.datastax.driver.core.SimpleStatement
-import com.datastax.driver.core.Statement
-
-import io.gatling.core.session._
+import com.datastax.oss.driver.api.core.cql.{BoundStatement, PreparedStatement, SimpleStatement, Statement}
 import io.gatling.commons.validation._
+import io.gatling.core.session._
 
 trait CqlStatement {
-  def apply(session:Session): Validation[Statement]
+  def apply(session:Session): Validation[Statement[_]]
 }
 
 case class SimpleCqlStatement(statement: Expression[String]) extends CqlStatement {
-  def apply(session: Session): Validation[Statement] = statement(session).flatMap(stmt => new SimpleStatement(stmt).success)
+  override def apply(session: Session): Validation[SimpleStatement] =
+    statement(session).flatMap(
+      stmt => SimpleStatement.newInstance(stmt).success
+    )
 }
 
 case class SimpleCqlStatementWithParams(statement: Expression[String], parameters: Expression[Seq[AnyRef]]) extends CqlStatement {
-  def apply(session:Session): Validation[Statement] = {
+  override def apply(session:Session): Validation[SimpleStatement] = {
     statement(session).flatMap(
       stmt => {
         parameters(session).flatMap(
-          params => new SimpleStatement(stmt, params.map(p => p): _*).success
+          params => SimpleStatement.newInstance(stmt, params.map(p => p): _*).success
         )
       }
     )
@@ -50,11 +50,11 @@ case class SimpleCqlStatementWithParams(statement: Expression[String], parameter
 }
 
 case class BoundCqlStatement(statement: PreparedStatement, params: Expression[AnyRef]*) extends CqlStatement {
-  def apply(session:Session): Validation[Statement] = {
+  override def apply(session:Session): Validation[BoundStatement] = {
     val parsedParams = params.map(param => if (param != null) param(session) else Success(null))
     val (validParsedParams, failures) = parsedParams.partition {case Success(s) => true; case _ => false}
     failures.toList match {
-      case x :: xs => x match {
+      case x :: _ => x match {
         case Failure(error) => error.failure
       }
       case _ => try {
@@ -62,7 +62,7 @@ case class BoundCqlStatement(statement: PreparedStatement, params: Expression[An
           statement.bind(ps: _*).success
         )
       } catch {
-        case e: Exception => e.getMessage().failure
+        case e: Exception => e.getMessage.failure
       }
     }
   }

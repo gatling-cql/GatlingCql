@@ -22,11 +22,13 @@
  */
 package io.github.gatling.cql.response
 
-import java.util.{ HashMap => JHashMap }
+import java.util.{HashMap => JHashMap}
 
-import com.datastax.driver.core.exceptions.DriverException
-import com.datastax.driver.core.{ResultSet, Statement}
-import com.google.common.util.concurrent.FutureCallback
+import com.datastax.oss.driver.api.core.DriverException
+import com.datastax.oss.driver.api.core.cql.AsyncResultSet
+import com.datastax.oss.driver.api.core.session.Request
+import com.datastax.oss.driver.internal.core.cql.ResultSets
+import com.datastax.oss.driver.shaded.guava.common.util.concurrent.FutureCallback
 import com.typesafe.scalalogging.StrictLogging
 import io.gatling.commons.stats._
 import io.gatling.commons.validation.Failure
@@ -39,17 +41,17 @@ import io.github.gatling.cql.request.CqlComponents
 
 
 class CqlResponseHandler(next: Action, session: Session, cqlComponents: CqlComponents, start: Long, tag: String,
-                         stmt: Statement,
+                         stmt: Request,
                          checks: List[CqlCheck])
-  extends FutureCallback[ResultSet] with StrictLogging {
+  extends FutureCallback[AsyncResultSet] with StrictLogging { //FIXME: remove FutureCallback
 
   private def writeData(status: Status, respTimings: ResponseTimings, message: Option[String]) =
     cqlComponents.coreComponents.statsEngine.logResponse(session, tag, respTimings.startTimestamp, respTimings.endTimestamp,
       status, None,
       message)
 
-  def onSuccess(resultSet: ResultSet) = {
-    val response = new CqlResponse(resultSet)
+  override def onSuccess(resultSet: AsyncResultSet): Unit = {
+    val response = CqlResponse(ResultSets.newInstance(resultSet))
     val respTimings = ResponseTimings(start, cqlComponents.coreComponents.clock.nowMillis)
 
     cqlComponents.coreComponents.actorSystem.dispatcher.execute(() => {
@@ -71,22 +73,20 @@ class CqlResponseHandler(next: Action, session: Session, cqlComponents: CqlCompo
     })
   }
 
-  def onFailure(t: Throwable): Unit = {
+  override def onFailure(t: Throwable): Unit = {
     val respTimings = ResponseTimings(start, cqlComponents.coreComponents.clock.nowMillis)
 
-    cqlComponents.coreComponents.actorSystem.dispatcher.execute(new Runnable() {
-      override def run() {
-        if (t.isInstanceOf[DriverException]) {
-          val msg = tag + ": c.d.d.c.e." + t.getClass.getSimpleName + ": " + t.getMessage
-          writeData(KO, respTimings, Some(msg))
-        }
-        else {
-          logger.error(s"$tag: Error executing statement $stmt", t)
-          writeData(KO, respTimings, Some(tag + ": " + t.toString))
-        }
-
-        next ! session.markAsFailed
+    cqlComponents.coreComponents.actorSystem.dispatcher.execute(() => {
+      if (t.isInstanceOf[DriverException]) {
+        val msg = tag + ": c.d.d.c.e." + t.getClass.getSimpleName + ": " + t.getMessage
+        writeData(KO, respTimings, Some(msg))
       }
+      else {
+        logger.error(s"$tag: Error executing statement $stmt", t)
+        writeData(KO, respTimings, Some(tag + ": " + t.toString))
+      }
+
+      next ! session.markAsFailed
     })
   }
 }

@@ -22,16 +22,16 @@
  */
 package io.github.gatling.cql.request
 
-import com.datastax.driver.core.Session
+import com.datastax.oss.driver.api.core.CqlSession
 import com.typesafe.scalalogging.StrictLogging
 
 //just a wrapper around CqlProtocol
 
 object CqlProtocolBuilder {
-  def session(session: Session) = CqlProtocolBuilder(session)
+  def session(session: CqlSession) = CqlProtocolBuilder(session)
 }
 
-case class CqlProtocolBuilder(session: Session) extends StrictLogging {
+case class CqlProtocolBuilder(session: CqlSession) extends StrictLogging {
   def build = new CqlProtocol(session)
 }
 

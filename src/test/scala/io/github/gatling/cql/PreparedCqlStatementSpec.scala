@@ -22,15 +22,14 @@
  */
 package io.github.gatling.cql
 
-import org.scalatest.matchers.should._
-import com.datastax.driver.core.BoundStatement
-import com.datastax.driver.core.PreparedStatement
+import com.datastax.oss.driver.api.core.cql.{BoundStatement, PreparedStatement}
 import io.gatling.commons.validation._
-import io.gatling.core.session.el.ElCompiler
 import io.gatling.core.session.Session
+import io.gatling.core.session.el.ElCompiler
 import org.easymock.EasyMock._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should._
 import org.scalatestplus.easymock.EasyMockSugar
 
 class PreparedCqlStatementSpec extends AnyFlatSpec with EasyMockSugar with Matchers with BeforeAndAfter {

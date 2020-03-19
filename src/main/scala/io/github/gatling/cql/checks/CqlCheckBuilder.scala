@@ -24,7 +24,7 @@ package io.github.gatling.cql.checks
 
 import java.util
 
-import com.datastax.driver.core.{ExecutionInfo, ResultSet}
+import com.datastax.oss.driver.api.core.cql.{ExecutionInfo, ResultSet}
 import io.gatling.commons.validation._
 import io.gatling.core.check._
 import io.gatling.core.session._
@@ -55,7 +55,7 @@ object CqlCheckBuilder {
   val ResultSet = new CqlCheckBuilder[ResultSet](ResultSetExtractor.expressionSuccess)
   val RowCount = new CqlCheckBuilder[Int](RowCountExtractor.expressionSuccess)
   val Applied = new CqlCheckBuilder[Boolean](AppliedExtractor.expressionSuccess)
-  val Exhausted = new CqlCheckBuilder[Boolean](ExhaustedExtractor.expressionSuccess)
+  val FullyFetched = new CqlCheckBuilder[Boolean](ExhaustedExtractor.expressionSuccess)
 
   /**
     * Get a column by name returned by the CQL statement.

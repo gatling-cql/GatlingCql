@@ -22,7 +22,7 @@
  */
 package io.github.gatling.cql.checks
 
-import com.datastax.driver.core.{ExecutionInfo, ResultSet, Row}
+import com.datastax.oss.driver.api.core.cql.{ExecutionInfo, ResultSet, Row}
 import io.gatling.commons.validation._
 import io.github.gatling.cql.checks.CqlExtractors._
 import io.github.gatling.cql.response.CqlResponse

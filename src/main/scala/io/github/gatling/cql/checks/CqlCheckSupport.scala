@@ -43,16 +43,20 @@ trait CqlCheckSupport {
     override protected val preparer: Preparer[CqlResponse, CqlResponse] = _.success
   }
 
-  val exhausted = CqlCheckBuilder.Exhausted
+  val exhausted = CqlCheckBuilder.FullyFetched
+  /**
+   * Don't use it after `rowCount`
+   */
   val applied = CqlCheckBuilder.Applied
 
   val executionInfo = CqlCheckBuilder.ExecutionInfo
   val resultSet = CqlCheckBuilder.ResultSet
 
   /**
-    * Get the number of all rows returned by the CQL statement.
-    * Note that this statement implicitly fetches <b>all</b> rows from the result set!
-    */
+   * Get the number of all rows returned by the CQL statement.
+   * Note that this statement implicitly fetches <b>all</b> rows from the result set!
+   * Don't use `applied ` after `rowCount` as it will fail
+   */
   val rowCount = CqlCheckBuilder.RowCount
 
   val columnValue = CqlCheckBuilder.columnValue _
