@@ -43,7 +43,7 @@ trait CqlCheckSupport {
     override protected val preparer: Preparer[CqlResponse, CqlResponse] = _.success
   }
 
-  val exhausted = CqlCheckBuilder.FullyFetched
+  val exhausted = CqlCheckBuilder.Exhausted
   /**
    * Don't use it after `rowCount`
    */
