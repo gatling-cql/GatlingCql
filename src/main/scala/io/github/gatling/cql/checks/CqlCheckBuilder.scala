@@ -55,7 +55,7 @@ object CqlCheckBuilder {
   val ResultSet = new CqlCheckBuilder[ResultSet](ResultSetExtractor.expressionSuccess)
   val RowCount = new CqlCheckBuilder[Int](RowCountExtractor.expressionSuccess)
   val Applied = new CqlCheckBuilder[Boolean](AppliedExtractor.expressionSuccess)
-  val FullyFetched = new CqlCheckBuilder[Boolean](ExhaustedExtractor.expressionSuccess)
+  val Exhausted = new CqlCheckBuilder[Boolean](ExhaustedExtractor.expressionSuccess)
 
   /**
     * Get a column by name returned by the CQL statement.
