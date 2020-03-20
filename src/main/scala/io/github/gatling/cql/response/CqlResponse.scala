@@ -22,14 +22,14 @@
  */
 package io.github.gatling.cql.response
 
-import com.datastax.driver.core.{ResultSet, Row}
+import com.datastax.oss.driver.api.core.cql.{ResultSet, Row}
 
 import scala.collection.JavaConverters._
 
 case class CqlResponse(resultSet: ResultSet) {
 
   // implicit cache of all rows of the result set
-  private lazy val allRows:Seq[Row] = resultSet.all().asScala
+  private lazy val allRows: Seq[Row] = resultSet.all().asScala
 
   /**
    * Get the number of all rows returned by the CQL statement.
@@ -43,7 +43,7 @@ case class CqlResponse(resultSet: ResultSet) {
    */
   def column(name: String): Seq[Any] = {
     allRows.flatMap( row => {
-      val idx = row.getColumnDefinitions.getIndexOf(name)
+      val idx = row.getColumnDefinitions.firstIndexOf(name)
       // idx == -1 means: "column not in result set"
       if (idx == -1 || row.isNull(idx))
         None

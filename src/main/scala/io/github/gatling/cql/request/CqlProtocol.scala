@@ -22,7 +22,7 @@
  */
 package io.github.gatling.cql.request
 
-import com.datastax.driver.core.{Session => CqlSession}
+import com.datastax.oss.driver.api.core.CqlSession
 import io.gatling.core.CoreComponents
 import io.gatling.core.config.GatlingConfiguration
 import io.gatling.core.protocol.{Protocol, ProtocolComponents, ProtocolKey}

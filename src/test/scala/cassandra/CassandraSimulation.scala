@@ -22,22 +22,18 @@
  */
 package cassandra
 
-import scala.concurrent.duration.DurationInt
-
-import com.datastax.driver.core.Cluster
-import com.datastax.driver.core.ConsistencyLevel
-
+import com.datastax.oss.driver.api.core.{ConsistencyLevel, CqlSession}
 import io.gatling.core.Predef._
 import io.gatling.core.scenario.Simulation
-
 import io.github.gatling.cql.Predef._
+
+import scala.concurrent.duration.DurationInt
 
 
 class CassandraSimulation extends Simulation {
   val keyspace = "test"
   val table_name = "test_table"
-  val cluster = Cluster.builder().addContactPoint("127.0.0.1").build()
-  val session = cluster.connect() //Your C* session
+  val session = CqlSession.builder().build()//Your C* session
   session.execute(s"""CREATE KEYSPACE IF NOT EXISTS $keyspace 
                       WITH replication = { 'class' : 'SimpleStrategy', 
                                           'replication_factor': '1'}""")
@@ -91,5 +87,5 @@ class CassandraSimulation extends Simulation {
   setUp(scn.inject(rampUsersPerSec(10) to 100 during (30 seconds)))
     .protocols(cqlConfig)
 
-  after(cluster.close())
+  after(session.close())
 }

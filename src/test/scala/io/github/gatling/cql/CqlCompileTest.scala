@@ -22,21 +22,18 @@
  */
 package io.github.gatling.cql
 
-import scala.concurrent.duration.DurationInt
-
-import com.datastax.driver.core.{ConsistencyLevel, Cluster}
-
+import com.datastax.oss.driver.api.core.{ConsistencyLevel, CqlSession}
 import io.gatling.core.Predef._
 import io.gatling.core.scenario.Simulation
 import io.gatling.http.Predef._
-
 import io.github.gatling.cql.Predef._
+
+import scala.concurrent.duration.DurationInt
 
 class CqlCompileTest extends Simulation {
   val keyspace = "test"
   val table_name = "test_table"
-  val cluster = Cluster.builder().addContactPoint("127.0.0.1").build()
-  val session = cluster.connect(s"$keyspace")
+  val session = CqlSession.builder().withKeyspace(s"$keyspace").build()
   val cqlConfig = cql.session(session)
 
   session.execute(s"CREATE KEYSPACE IF NOT EXISTS $keyspace WITH replication = { 'class' : 'SimpleStrategy', 'replication_factor': '1'}")
@@ -105,5 +102,5 @@ class CqlCompileTest extends Simulation {
   setUp(scn.inject(rampUsersPerSec(10) to 100 during (30 seconds)))
     .protocols(cqlConfig)
 
-  after(cluster.close())
+  after(session.close())
 }

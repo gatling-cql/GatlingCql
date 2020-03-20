@@ -24,7 +24,7 @@ package io.github.gatling.cql.checks
 
 import java.util
 
-import com.datastax.driver.core.{ExecutionInfo, ResultSet}
+import com.datastax.oss.driver.api.core.cql.{ExecutionInfo, ResultSet}
 import io.gatling.commons.validation._
 import io.gatling.core.check._
 import io.gatling.core.session._

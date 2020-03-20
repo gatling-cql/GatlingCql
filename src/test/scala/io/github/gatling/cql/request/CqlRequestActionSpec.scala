@@ -22,8 +22,11 @@
  */
 package io.github.gatling.cql.request
 
+import java.util.concurrent.CompletionStage
+
 import akka.actor.ActorSystem
-import com.datastax.driver.core._
+import com.datastax.oss.driver.api.core.cql.{AsyncResultSet, SimpleStatement}
+import com.datastax.oss.driver.api.core.{ConsistencyLevel, CqlSession}
 import io.gatling.commons.stats.KO
 import io.gatling.commons.util.DefaultClock
 import io.gatling.commons.validation.{FailureWrapper, SuccessWrapper}
@@ -43,7 +46,7 @@ import org.scalatestplus.easymock.EasyMockSugar
 
 class CqlRequestActionSpec extends AnyFlatSpec with EasyMockSugar with Matchers with BeforeAndAfter {
   val config = GatlingConfiguration.loadForTest()
-  val cassandraSession = mock[Session]
+  val cassandraSession = mock[CqlSession]
   val statement = mock[CqlStatement]
   val system = mock[ActorSystem]
   val statsEngine = mock[StatsEngine]
@@ -75,10 +78,10 @@ class CqlRequestActionSpec extends AnyFlatSpec with EasyMockSugar with Matchers 
   }
 
   it should "execute a valid statement" in {
-    val statementCapture = Capture.newInstance[RegularStatement]()
+    val statementCapture = Capture.newInstance[SimpleStatement]()
     expecting {
-      statement.apply(session).andReturn(new SimpleStatement("select * from test").success)
-      cassandraSession.executeAsync(capture(statementCapture)) andReturn mock[ResultSetFuture]
+      statement.apply(session).andReturn(SimpleStatement.newInstance("select * from test").success)
+      cassandraSession.executeAsync(capture(statementCapture)) andReturn mock[CompletionStage[AsyncResultSet]]
     }
     whenExecuting(statement, cassandraSession) {
       target.execute(session)
@@ -86,6 +89,6 @@ class CqlRequestActionSpec extends AnyFlatSpec with EasyMockSugar with Matchers 
     val capturedStatement = statementCapture.getValue
     capturedStatement shouldBe a[SimpleStatement]
     capturedStatement.getConsistencyLevel shouldBe ConsistencyLevel.ANY
-    capturedStatement.getQueryString should be("select * from test")
+    capturedStatement.getQuery should be("select * from test")
   }
 }

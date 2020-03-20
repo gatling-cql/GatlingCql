@@ -22,21 +22,18 @@
  */
 package io.github.gatling.cql.request
 
-import com.datastax.driver.core.Statement
-import com.google.common.util.concurrent.{Futures, MoreExecutors}
+import com.datastax.oss.driver.api.core.cql._
 import io.gatling.commons.stats.KO
 import io.gatling.commons.util.Clock
-import io.gatling.commons.validation.Validation
 import io.gatling.core.action.{Action, ExitableAction}
 import io.gatling.core.session.Session
 import io.gatling.core.stats.StatsEngine
 import io.github.gatling.cql.response.CqlResponseHandler
 
-class CqlRequestAction(val name: String, val next: Action, components: CqlComponents, attr: CqlAttributes)
-  extends ExitableAction {
+class CqlRequestAction(val name: String, val next: Action, components: CqlComponents, attr: CqlAttributes) extends ExitableAction {
 
-  def execute(session: Session): Unit = {
-    val stmt: Validation[Statement] = attr.statement(session)
+  override def execute(session: Session): Unit = {
+    val stmt = attr.statement(session)
 
     stmt.onFailure(err => {
       statsEngine.logResponse(session, name, clock.nowMillis, clock.nowMillis, KO, None, Some("Error" +
@@ -45,18 +42,24 @@ class CqlRequestAction(val name: String, val next: Action, components: CqlCompon
     })
 
     stmt.onSuccess({ stmt =>
-      stmt.setConsistencyLevel(attr.cl)
-      stmt.setSerialConsistencyLevel(attr.serialCl)
-
       val start = clock.nowMillis
-      val result = components.cqlProtocol.session.executeAsync(stmt)
-      Futures.addCallback(result,
-        new CqlResponseHandler(next, session, components, start, attr.tag, stmt, attr.checks),
-        MoreExecutors.sameThreadExecutor)
+      val result = components.cqlProtocol.session.executeAsync(applyAttributes(stmt).build())
+      val handler = new CqlResponseHandler(next, session, components, start, attr.tag, stmt, attr.checks)
+      result.whenCompleteAsync((r: AsyncResultSet, e: Throwable) => {
+        if (e != null) handler.onFailure(e)
+        else handler.onSuccess(r)
+      })
     })
   }
 
   override def clock: Clock = components.coreComponents.clock
 
   override def statsEngine: StatsEngine = components.coreComponents.statsEngine
+
+  // java types for Statement classes are somewhat crazy, so this is the only why I've found to deal with those in Scala
+  // For adventurous: try to annotate this function with a Scala type
+  private def applyAttributes(s: Statement[_]) = s match {
+    case simple: SimpleStatement => new SimpleStatementBuilder(simple).setConsistencyLevel(attr.cl).setSerialConsistencyLevel(attr.serialCl)
+    case bound: BoundStatement => new BoundStatementBuilder(bound).setConsistencyLevel(attr.cl).setSerialConsistencyLevel(attr.serialCl)
+  }
 }
