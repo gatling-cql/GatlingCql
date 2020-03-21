@@ -222,9 +222,17 @@
         </plugins>
     </build>
 
-	<scm>
-		<developerConnection>scm:git:git@github.com:gatling-cql/GatlingCql.git</developerConnection>
-		<tag>HEAD</tag>
-	</scm>
+    <scm>
+        <developerConnection>scm:git:git@github.com:gatling-cql/GatlingCql.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/gatling-cql/GatlingCql</url>
+        </repository>
+    </distributionManagement>
 
 </project>
