@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github</groupId>
     <artifactId>GatlingCql</artifactId>
-    <version>3.0.1-SNAPSHOT</version>
+    <version>3.3.1</version>
     <name>${project.artifactId}</name>
     <description>Gatling support for Apache Cassandra CQL</description>
 
@@ -224,7 +224,7 @@
 
     <scm>
         <developerConnection>scm:git:git@github.com:gatling-cql/GatlingCql.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>GatlingCql-3.3.1</tag>
     </scm>
 
     <distributionManagement>
