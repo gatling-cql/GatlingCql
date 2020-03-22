@@ -131,6 +131,10 @@
                 <groupId>io.gatling</groupId>
                 <artifactId>gatling-maven-plugin</artifactId>
                 <version>${gatling.maven-plugin.version}</version>
+                <configuration>
+                    <disableCompiler>true</disableCompiler>
+                    <simulationClass>io.github.gatling.cql.CheckCompileTest</simulationClass>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>com.mycila</groupId>
