@@ -35,6 +35,9 @@ class CqlCheckBuilder[X](extractor: Expression[CqlExtractor[X]]) extends FindChe
 
   def find: ValidatorCheckBuilder[CqlCheckType, CqlResponse, X] = ValidatorCheckBuilder(extractor, displayActualValue = true)
 
+  /**
+   * Allow to define any condition for a given [[io.github.gatling.cql.checks#CqlCheck CqlCheck]]
+   */
   def satisfies(predicate: X => Boolean) = find.validate(CqlCheckBuilder.satisfies(predicate))
 }
 
@@ -56,11 +59,6 @@ object CqlCheckBuilder {
   val RowCount = new CqlCheckBuilder[Int](RowCountExtractor.expressionSuccess)
   val Applied = new CqlCheckBuilder[Boolean](AppliedExtractor.expressionSuccess)
   val Exhausted = new CqlCheckBuilder[Boolean](ExhaustedExtractor.expressionSuccess)
-
-  /**
-    * Get a column by name returned by the CQL statement.
-    * Note that this statement implicitly fetches <b>all</b> rows from the result set!
-    */
 
   def columnValue(columnName: Expression[String]) = new DefaultMultipleFindCheckBuilder[CqlCheckType, CqlResponse, Any](true) {
       override def findExtractor(occurrence: Int) = columnName.map(singleRecordExtractor(_, occurrence))

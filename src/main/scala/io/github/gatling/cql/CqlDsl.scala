@@ -27,8 +27,18 @@ import io.github.gatling.cql.checks.CqlCheckSupport
 import io.github.gatling.cql.request.{CqlProtocol, CqlProtocolBuilder, CqlRequestBuilder, CqlRequestBuilderBase}
 
 trait CqlDsl extends CqlCheckSupport {
+  /**
+   * Gatling Protocol for CQL
+   *
+   * @return [[io.gatling.core.protocol.Protocol]] implementation for CQL
+   * */
   val cql = CqlProtocolBuilder
 
+  /**
+   * Executes CQL action
+   *
+   * @return CQL specific implementation [[io.gatling.core.action.Action]]
+   * */
   def cql(tag: String) = CqlRequestBuilderBase(tag)
 
   implicit def cqlProtocolBuilder2cqlProtocol(builder: CqlProtocolBuilder): CqlProtocol = builder.build

@@ -26,5 +26,10 @@ import io.gatling.core.check.Check
 import io.github.gatling.cql.response.CqlResponse
 
 package object checks {
+  /**
+   * A CQL specific [[io.gatling.core.check.Check check]] for [[io.github.gatling.cql.response.CqlResponse]]
+   *
+   * @see Gatling documentation for more details about Checks
+   */
   type CqlCheck = Check[CqlResponse]
 }
