@@ -1,9 +1,11 @@
 # This workflow will build a Java project with Maven
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
 
-name: Verify PR
+name: Verify commit
 
 on:
+  push:
+    branches: [ master ]
   pull_request:
     branches: [ master ]
 
