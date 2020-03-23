@@ -26,6 +26,10 @@ import com.datastax.oss.driver.api.core.cql.{ResultSet, Row}
 
 import scala.collection.JavaConverters._
 
+/**
+ * A holder for a [[com.datastax.oss.driver.api.core.cql.ResultSet resultSet]] which provides
+ * a couple of convenient functions
+ */
 case class CqlResponse(resultSet: ResultSet) {
 
   // implicit cache of all rows of the result set
@@ -33,13 +37,13 @@ case class CqlResponse(resultSet: ResultSet) {
 
   /**
    * Get the number of all rows returned by the CQL statement.
-   * Note that this statement implicitly fetches <b>all</b> rows from the result set!
+   * Note that this statement implicitly fetches '''all''' rows from the result set!
    */
   def rowCount: Int = allRows.length
 
   /**
    * Get a column by name returned by the CQL statement.
-   * Note that this statement implicitly fetches <b>all</b> rows from the result set!
+   * Note that this statement implicitly fetches '''all''' rows from the result set!
    */
   def column(name: String): Seq[Any] = {
     allRows.flatMap( row => {

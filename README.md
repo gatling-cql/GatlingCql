@@ -1,14 +1,17 @@
-GatlingCql
-==========
+# GatlingCql
 
-Gatling DSL support for Apache Cassandra CQL
+Gatling DSL support for Apache Cassandra CQL.
 
-Features
---------
+## Features
 
-Basic Gatling DSL for Apache Cassandra CQL, prepared statements are supported as well
+Basic Gatling DSL for Apache Cassandra CQL, prepared statements are supported as well.
 
 ```scala
+import com.datastax.oss.driver.api.core.{ConsistencyLevel, CqlSession}
+import io.gatling.core.Predef._
+import io.gatling.core.scenario.Simulation
+import io.github.gatling.cql.Predef._
+
 class CassandraSimulation extends Simulation {
   val keyspace = "test"
   val table_name = "test_table"
@@ -70,15 +73,31 @@ class CassandraSimulation extends Simulation {
 }
 ```
 
+## Installation
 
-Installation
-------------
+### For the `gatling-charts-highcharts-bundle`
 
 * Get a release TGZ
-* Unpack into Gatling folder: ``tar -xjf GatlingCql-3.3.1-release.tar.gz -C gatling-charts-highcharts-bundle-3.3.1/``
-* Run Gatling and you should see ``cassandra.CassandraSimulation`` in your simulations list
+* Unpack into Gatling folder: `tar -xjf GatlingCql-3.3.1-bundle.tar.gz -C gatling-charts-highcharts-bundle-3.3.1/`
+* Run Gatling and you should see `cassandra.CassandraSimulation` in your simulations list
 
-More Information
-----------------
+### As a library
+
+Include `gatling-cql` as a dependency to your project
+
+#### Maven
+
+```xml
+    <dependencies>
+        <dependency>
+            <groupId>io.github.gatling-cql</groupId>
+            <artifactId>gatling-cql</artifactId>
+            <version>$LATEST_RELEASE</version>
+        </dependency>
+    </dependencies>
+```
+
+# More Information
+
 * http://gatling.io/docs/3.3/quickstart
 * http://gatling.io/docs/3.3/cheat-sheet

@@ -31,24 +31,47 @@ import io.github.gatling.cql.{BoundCqlStatement, SimpleCqlStatement, SimpleCqlSt
 
 
 case class CqlRequestBuilderBase(tag: String) {
+  /**
+   * Executes a simple statement without parameters
+   * */
   def execute(statement: Expression[String]) = CqlRequestBuilder(CqlAttributes(tag, SimpleCqlStatement(statement)))
+
+  /**
+   * Executes a simple statement with parameters
+   * */
   def execute(statement: Expression[String], params: Expression[Seq[AnyRef]]) = CqlRequestBuilder(CqlAttributes(tag, SimpleCqlStatementWithParams(statement, params)))
+  /**
+   * Executes an instance of [[com.datastax.oss.driver.api.core.cql.PreparedStatement]]
+   * */
   def execute(prepared: PreparedStatement) = CqlPreparedRequestParamsBuilder(tag, prepared)
 }
 
 case class CqlPreparedRequestParamsBuilder(tag: String, prepared: PreparedStatement) {
+  /**
+   * Provides positional parameters for [[com.datastax.oss.driver.api.core.cql.PreparedStatement]]
+   * */
   def withParams(params: Expression[AnyRef]*) = CqlRequestBuilder(CqlAttributes(tag, BoundCqlStatement(prepared, params: _*)))
 }
 
 case class CqlRequestBuilder(attr: CqlAttributes) {
+  /**
+   * Sets `consistencyLevel` ([[com.datastax.oss.driver.api.core.ConsistencyLevel]] )for the action
+   * */
   def consistencyLevel(level: ConsistencyLevel) = CqlRequestBuilder(attr.copy(cl= level))
+
+  /**
+   * Sets `serialConsistencyLevel` ([[com.datastax.oss.driver.api.core.ConsistencyLevel]]) for the action
+   * */
   def serialConsistencyLevel(level: ConsistencyLevel) = CqlRequestBuilder(attr.copy(serialCl= level))
+
   def build(): ActionBuilder = new CqlRequestActionBuilder(attr)
 
   /**
-   * Stops defining the request and adds checks on the response
+   * Stops defining the request and adds [[io.github.gatling.cql.checks#CqlCheck CqlCheck]]s on the response
    *
-   * @param checks the checks that will be performed on the response
+   * @param checks a sequence of the [[io.github.gatling.cql.checks#CqlCheck CqlCheck]]s which will be
+   *               performed on the
+   *               response
    */
   def check(checks: CqlCheck*): CqlRequestBuilder = CqlRequestBuilder(attr.copy(checks = attr.checks ::: checks.toList))
 }

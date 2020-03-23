@@ -43,24 +43,52 @@ trait CqlCheckSupport {
     override protected val preparer: Preparer[CqlResponse, CqlResponse] = _.success
   }
 
-  val exhausted = CqlCheckBuilder.Exhausted
   /**
-   * Don't use it after `rowCount`
-   */
+   * Pre-built [[io.github.gatling.cql.checks#CqlCheck CqlCheck]] to check if a
+   * [[com.datastax.oss.driver.api.core.cql.ResultSet resultSet]]
+   * has more records
+   * */
+  val exhausted = CqlCheckBuilder.Exhausted
+
+  /**
+   * Pre-built [[io.github.gatling.cql.checks#CqlCheck CqlCheck]] for
+   * [[com.datastax.oss.driver.api.core.cql.ResultSet#wasApplied() ResultSet#wasApplied()]]
+   *
+   *  @note don't use after [[rowCount]]
+   **/
   val applied = CqlCheckBuilder.Applied
 
+  /**
+   * Pre-built [[io.github.gatling.cql.checks#CqlCheck CqlCheck]] for
+   * [[com.datastax.oss.driver.api.core.PagingIterable#getExecutionInfo() ResultSet#getExecutionInfo()]]
+   * */
   val executionInfo = CqlCheckBuilder.ExecutionInfo
+
+  /**
+   * Pre-built [[io.github.gatling.cql.checks#CqlCheck CqlCheck]] for
+   * [[com.datastax.oss.driver.api.core.cql.ResultSet resultSet]] itself.
+   * */
   val resultSet = CqlCheckBuilder.ResultSet
 
   /**
-   * Get the number of all rows returned by the CQL statement.
-   * Note that this statement implicitly fetches <b>all</b> rows from the result set!
-   * Don't use `applied ` after `rowCount` as it will fail
-   */
+   * Pre-built [[io.github.gatling.cql.checks#CqlCheck CqlCheck]] to check the number of all rows returned by the CQL
+   * statement.
+   *
+   * @note this statement implicitly fetches '''all''' rows from the result set!
+   * @note don't use [[applied]] after [[rowCount]] as it will fail
+   **/
   val rowCount = CqlCheckBuilder.RowCount
 
+  /**
+   * Get a column by name returned by the CQL statement.
+   * @note his statement implicitly fetches '''all''' rows from the result set!
+   */
   val columnValue = CqlCheckBuilder.columnValue _
 
+  /**
+   * Porvides a way to define any [[io.github.gatling.cql.checks#CqlCheck CqlCheck]] to check any predicate against
+   * a [[com.datastax.oss.driver.api.core.cql.ResultSet resultSet]]
+   */
   val simpleCheck = CqlCheckBuilder.simpleCheck _
 
 }

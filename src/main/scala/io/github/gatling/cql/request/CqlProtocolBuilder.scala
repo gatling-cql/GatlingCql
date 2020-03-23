@@ -28,6 +28,9 @@ import com.typesafe.scalalogging.StrictLogging
 //just a wrapper around CqlProtocol
 
 object CqlProtocolBuilder {
+  /**
+   * Defines an instance of [[com.datastax.oss.driver.api.core.CqlSession]] which will be used by the CQL protocol
+   * */
   def session(session: CqlSession) = CqlProtocolBuilder(session)
 }
 

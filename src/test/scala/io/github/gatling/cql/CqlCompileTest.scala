@@ -25,7 +25,6 @@ package io.github.gatling.cql
 import com.datastax.oss.driver.api.core.{ConsistencyLevel, CqlSession}
 import io.gatling.core.Predef._
 import io.gatling.core.scenario.Simulation
-import io.gatling.http.Predef._
 import io.github.gatling.cql.Predef._
 
 import scala.concurrent.duration.DurationInt
@@ -59,34 +58,12 @@ class CqlCompileTest extends Simulation {
 
   val scn = scenario("Two statements").repeat(1) {
     feed(feeder)
-    .exec(http("GET").get("http://foo.bar/")
-            .check(bodyString)
-    )
     .exec(cql("simple SELECT")
         .execute("SELECT * FROM test_table WHERE num = ${randomNum}")
         .check(exhausted is false)
         .check(applied is false)
         .check(columnValue("num").count.gt(1))
     )
-
-/*
-        .check { result =>
-          if (result.all().isEmpty) {
-            Failure("failed test")
-          } else {
-            Success(true)
-          }
-        }
-        .postProcess {
-          param => {
-            if (!param.result.isExhausted)
-              param.session.set("row-of-" + param.tag, param.result.one().getInt("num"))
-            else
-              param.session
-          }
-        })
-*/
-
     .exec(cql("prepared INSERT")
         .execute(prepared)
         .withParams(Integer.valueOf(random.nextInt()), "${randomString}")
