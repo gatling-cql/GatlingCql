@@ -24,5 +24,9 @@ jobs:
         path: ~/.m2
         key: ${{ env.JAVA_HOME }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ env.JAVA_HOME }}-m2
-    - name: Build with Maven
-      run: mvn -B deploy --file pom.xml
+    - name: Deploy
+      run: mvn -B deploy
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+        MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
