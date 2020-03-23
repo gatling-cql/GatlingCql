@@ -30,6 +30,5 @@ jobs:
     - name: Deploy
       run: mvn -B deploy
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
         MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
