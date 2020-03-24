@@ -2,7 +2,7 @@
 
 # GatlingCql
 
-Gatling DSL support for Apache Cassandra CQL.
+Gatling DSL support for [Apache Cassandra](https://cassandra.apache.org) CQL. Can be used with [Scylla](https://docs.scylladb.com/using-scylla/cassandra-compatibility/) as well
 
 ## Features
 
