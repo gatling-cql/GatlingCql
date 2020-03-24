@@ -1,3 +1,5 @@
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.gatling-cql/gatling-cql/badge.svg)](https://search.maven.org/artifact/io.github.gatling-cql/gatling-cql)
+
 # GatlingCql
 
 Gatling DSL support for Apache Cassandra CQL.
