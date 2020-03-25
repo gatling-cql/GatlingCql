@@ -5,7 +5,7 @@ on:
     branches: [ master ]
 
 jobs:
-  verify:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -27,7 +27,7 @@ jobs:
         key: ${{ env.JAVA_HOME }}-m2-${{ hashFiles('**/pom.xml') }}-${{ secrets.OSSRH_TOKEN }}
 
     - name: Deploy Snapshot
-      run: mvn -B clean deploy -DskipTests
+      run: mvn -B clean deploy
       env:
         MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
         MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
