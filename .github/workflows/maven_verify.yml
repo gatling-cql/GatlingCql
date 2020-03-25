@@ -25,12 +25,13 @@ jobs:
       uses: actions/cache@v1
       with:
         path: ~/.m2/repository
-        key: ${{ env.JAVA_HOME }}-m2-${{ hashFiles('**/pom.xml') }}
+        key: ${{ env.JAVA_HOME }}-m2-${{ hashFiles('**/pom.xml') }-${{ secrets.OSSRH_TOKEN }}}
         restore-keys: ${{ env.JAVA_HOME }}-m2
     - name: Maven Verify
       run: mvn -B verify
     - name: Deploy Snapshot
-      continue-on-error: true
+      # Don't deploy for PRs
+      if: github.event_name != 'pull_request'
       run: mvn -B deploy -DskipTests
       env:
         MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
