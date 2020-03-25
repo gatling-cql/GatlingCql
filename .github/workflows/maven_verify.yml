@@ -24,14 +24,14 @@ jobs:
     - name: Cache Maven packages
       uses: actions/cache@v1
       with:
-        path: ~/.m2
+        path: ~/.m2/repository
         key: ${{ env.JAVA_HOME }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ env.JAVA_HOME }}-m2
     - name: Maven Verify
-      run: mvn -B verify --file pom.xml
+      run: mvn -B verify
     - name: Deploy Snapshot
       continue-on-error: true
-      run: mvn -B deploy
+      run: mvn -B deploy -DskipTests
       env:
         MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
         MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
