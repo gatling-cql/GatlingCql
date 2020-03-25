@@ -25,7 +25,7 @@ jobs:
       uses: actions/cache@v1
       with:
         path: ~/.m2/repository
-        key: ${{ env.JAVA_HOME }}-m2-${{ hashFiles('**/pom.xml') }-${{ secrets.OSSRH_TOKEN }}}
+        key: ${{ env.JAVA_HOME }}-m2-${{ hashFiles('**/pom.xml') }}-${{ secrets.OSSRH_TOKEN }}
         restore-keys: ${{ env.JAVA_HOME }}-m2
     - name: Maven Verify
       run: mvn -B verify
