@@ -27,7 +27,7 @@ jobs:
         key: ${{ env.JAVA_HOME }}-m2-${{ hashFiles('**/pom.xml') }}-${{ secrets.OSSRH_TOKEN }}
 
     - name: Deploy Snapshot
-      run: mvn -B deploy -DskipTests
+      run: mvn -B clean deploy -DskipTests
       env:
         MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
         MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}

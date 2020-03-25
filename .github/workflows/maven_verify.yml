@@ -27,4 +27,4 @@ jobs:
         restore-keys: ${{ env.JAVA_HOME }}-m2-${{ hashFiles('**/pom.xml') }}
 
     - name: Maven Verify
-      run: mvn -B verify
+      run: mvn -B clean verify
