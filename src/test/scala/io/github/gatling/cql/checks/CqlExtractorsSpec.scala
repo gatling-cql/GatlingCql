@@ -23,6 +23,7 @@
 package io.github.gatling.cql.checks
 
 import com.datastax.oss.driver.api.core.cql.{ExecutionInfo, ResultSet, Row}
+import io.gatling.commons.validation.Validation.NoneSuccess
 import io.gatling.commons.validation._
 import io.github.gatling.cql.checks.CqlExtractors._
 import io.github.gatling.cql.response.CqlResponse
@@ -32,7 +33,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should._
 import org.scalatestplus.easymock.EasyMockSugar
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class CqlExtractorsSpec extends AnyFlatSpec with EasyMockSugar with Matchers with BeforeAndAfter {
 

@@ -23,7 +23,6 @@
 package io.github.gatling.cql.request
 
 import java.util.concurrent.CompletionStage
-
 import akka.actor.ActorSystem
 import com.datastax.oss.driver.api.core.cql.{AsyncResultSet, SimpleStatement}
 import com.datastax.oss.driver.api.core.{ConsistencyLevel, CqlSession}
@@ -33,7 +32,7 @@ import io.gatling.commons.validation.{FailureWrapper, SuccessWrapper}
 import io.gatling.core.CoreComponents
 import io.gatling.core.action.Action
 import io.gatling.core.config.GatlingConfiguration
-import io.gatling.core.session.{Session => GSession}
+import io.gatling.core.session.Session
 import io.gatling.core.stats.StatsEngine
 import io.github.gatling.cql.CqlStatement
 import io.github.gatling.cql.checks.CqlCheck
@@ -51,8 +50,8 @@ class CqlRequestActionSpec extends AnyFlatSpec with EasyMockSugar with Matchers 
   val system = mock[ActorSystem]
   val statsEngine = mock[StatsEngine]
   val nextAction = mock[Action]
-  val coreComponents = CoreComponents(system, null, null, statsEngine, new DefaultClock, null, config)
-  val session = GSession("scenario", 1, System.currentTimeMillis)
+  val coreComponents = new CoreComponents(system, null, null, None, statsEngine, new DefaultClock, null, config)
+  val session = Session("scenario", 1, null)
 
   val target =
     new CqlRequestAction("some-name", nextAction,
@@ -67,7 +66,7 @@ class CqlRequestActionSpec extends AnyFlatSpec with EasyMockSugar with Matchers 
     val errorMessageCapture = Capture.newInstance[Some[String]]()
     expecting {
       statement.apply(session).andReturn("OOPS".failure)
-      statsEngine.logResponse(eqAs(session), anyString, anyObject[Long], anyObject[Long], eqAs(KO), eqAs(None), capture(errorMessageCapture))
+      statsEngine.logResponse(eqAs(session.scenario), eqAs(session.groups), anyObject[String], anyObject[Long], anyObject[Long], eqAs(KO), eqAs(None), capture(errorMessageCapture))
     }
 
     whenExecuting(statement, statsEngine) {

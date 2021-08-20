@@ -35,7 +35,6 @@ import io.gatling.commons.validation.Failure
 import io.gatling.core.action.Action
 import io.gatling.core.check.Check
 import io.gatling.core.session.Session
-import io.gatling.core.stats.message.ResponseTimings
 import io.github.gatling.cql.checks.CqlCheck
 import io.github.gatling.cql.request.CqlComponents
 
@@ -45,14 +44,14 @@ class CqlResponseHandler(next: Action, session: Session, cqlComponents: CqlCompo
                          checks: List[CqlCheck])
   extends FutureCallback[AsyncResultSet] with StrictLogging { //FIXME: remove FutureCallback
 
-  private def writeData(status: Status, respTimings: ResponseTimings, message: Option[String]) =
-    cqlComponents.coreComponents.statsEngine.logResponse(session, tag, respTimings.startTimestamp, respTimings.endTimestamp,
+  private def writeData(status: Status, startTs: Long, endTs: Long, message: Option[String]) =
+    cqlComponents.coreComponents.statsEngine.logResponse(session.scenario, session.groups, tag, startTs, endTs,
       status, None,
       message)
 
   override def onSuccess(resultSet: AsyncResultSet): Unit = {
     val response = CqlResponse(ResultSets.newInstance(resultSet))
-    val respTimings = ResponseTimings(start, cqlComponents.coreComponents.clock.nowMillis)
+    val endTs = cqlComponents.coreComponents.clock.nowMillis
 
     cqlComponents.coreComponents.actorSystem.dispatcher.execute(() => {
       val preparedCache: JHashMap[Any, Any] = new JHashMap()
@@ -60,13 +59,13 @@ class CqlResponseHandler(next: Action, session: Session, cqlComponents: CqlCompo
       val checkRes: (Session, Option[Failure]) = Check.check(response, session, checks, preparedCache)
 
       if (checkRes._2.isEmpty) {
-        writeData(OK, respTimings, None)
+        writeData(OK, start, endTs, None)
 
         next ! checkRes._1.markAsSucceeded
       }
       else {
         val errors = checkRes._2.get
-        writeData(KO, respTimings, Some(s"Error verifying results: $errors"))
+        writeData(KO, start, endTs, Some(s"Error verifying results: $errors"))
 
         next ! checkRes._1.markAsFailed
       }
@@ -74,16 +73,16 @@ class CqlResponseHandler(next: Action, session: Session, cqlComponents: CqlCompo
   }
 
   override def onFailure(t: Throwable): Unit = {
-    val respTimings = ResponseTimings(start, cqlComponents.coreComponents.clock.nowMillis)
+    val endTs = cqlComponents.coreComponents.clock.nowMillis
 
     cqlComponents.coreComponents.actorSystem.dispatcher.execute(() => {
       if (t.isInstanceOf[DriverException]) {
         val msg = tag + ": c.d.d.c.e." + t.getClass.getSimpleName + ": " + t.getMessage
-        writeData(KO, respTimings, Some(msg))
+        writeData(KO, start, endTs, Some(msg))
       }
       else {
         logger.error(s"$tag: Error executing statement $stmt", t)
-        writeData(KO, respTimings, Some(tag + ": " + t.toString))
+        writeData(KO, start, endTs, Some(tag + ": " + t.toString))
       }
 
       next ! session.markAsFailed

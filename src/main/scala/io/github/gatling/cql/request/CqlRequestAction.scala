@@ -36,7 +36,7 @@ class CqlRequestAction(val name: String, val next: Action, components: CqlCompon
     val stmt = attr.statement(session)
 
     stmt.onFailure(err => {
-      statsEngine.logResponse(session, name, clock.nowMillis, clock.nowMillis, KO, None, Some("Error" +
+      statsEngine.logResponse(session.scenario, session.groups, name, clock.nowMillis, clock.nowMillis, KO, None, Some("Error" +
         " setting up statement: " + err))
       next ! session.markAsFailed
     })

@@ -43,7 +43,7 @@ class PreparedCqlStatementSpec extends AnyFlatSpec with EasyMockSugar with Match
   }
 
   "BoundCqlStatement" should "correctly bind values to a prepared statement" in {
-    val session = new Session("name", 1, System.currentTimeMillis, Map("foo" -> Integer.valueOf(5), "baz" -> "BaZ"))
+    val session = Session("name", 1, null).set("foo", Integer.valueOf(5)).set("baz", "BaZ")
     expecting {
       prepared.bind(Integer.valueOf(5), "BaZ").andReturn(mock[BoundStatement])
     }
@@ -53,12 +53,12 @@ class PreparedCqlStatementSpec extends AnyFlatSpec with EasyMockSugar with Match
   }
 
   it should "fail if the expression is wrong and return the 1st error" in {
-    val session = new Session("name", 1, System.currentTimeMillis, Map("fu" -> Integer.valueOf(5), "buz" -> "BaZ"))
+    val session = Session("name", 1, null).set("fu", Integer.valueOf(5)).set("buz", "BaZ")
     target(session) shouldBe "No attribute named 'foo' is defined".failure
   }
 
   it should "handle null parameters correctly" in {
-    val session = new Session("name", 1, System.currentTimeMillis)
+    val session = Session("name", 1, null)
     val statementWithNull = BoundCqlStatement(prepared, null)
 
     statementWithNull(session) shouldBe a[Success[_]]

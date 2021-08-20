@@ -31,9 +31,7 @@ import io.gatling.core.session._
 import io.github.gatling.cql.checks.CqlExtractors._
 import io.github.gatling.cql.response.CqlResponse
 
-class CqlCheckBuilder[X](extractor: Expression[CqlExtractor[X]]) extends FindCheckBuilder[CqlCheckType, CqlResponse, X] {
-
-  def find: ValidatorCheckBuilder[CqlCheckType, CqlResponse, X] = ValidatorCheckBuilder(extractor, displayActualValue = true)
+class CqlCheckBuilder[X](extractor: Expression[CqlExtractor[X]]) extends DefaultFindCheckBuilder[CqlCheckType, CqlResponse, X](extractor, displayActualValue = true) {
 
   /**
    * Allow to define any condition for a given [[io.github.gatling.cql.checks#CqlCheck CqlCheck]]

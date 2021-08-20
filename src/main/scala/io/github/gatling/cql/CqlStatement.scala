@@ -27,40 +27,39 @@ import io.gatling.commons.validation._
 import io.gatling.core.session._
 
 trait CqlStatement {
-  def apply(session:Session): Validation[Statement[_]]
+  def apply(session: Session): Validation[Statement[_]]
 }
 
 case class SimpleCqlStatement(statement: Expression[String]) extends CqlStatement {
   override def apply(session: Session): Validation[SimpleStatement] =
-    statement(session).flatMap(
-      stmt => SimpleStatement.newInstance(stmt).success
-    )
+    for {
+      stmt <- statement(session)
+    } yield SimpleStatement.newInstance(stmt)
 }
 
 case class SimpleCqlStatementWithParams(statement: Expression[String], parameters: Expression[Seq[AnyRef]]) extends CqlStatement {
-  override def apply(session:Session): Validation[SimpleStatement] = {
-    statement(session).flatMap(
-      stmt => {
-        parameters(session).flatMap(
-          params => SimpleStatement.newInstance(stmt, params.map(p => p): _*).success
-        )
-      }
-    )
+  override def apply(session: Session): Validation[SimpleStatement] = {
+    for {
+      stmt <- statement(session)
+      params <- parameters(session)
+    } yield SimpleStatement.newInstance(stmt, params: _*)
   }
 }
 
 case class BoundCqlStatement(statement: PreparedStatement, params: Expression[AnyRef]*) extends CqlStatement {
-  override def apply(session:Session): Validation[BoundStatement] = {
+  override def apply(session: Session): Validation[BoundStatement] = {
     val parsedParams = params.map(param => if (param != null) param(session) else Success(null))
-    val (validParsedParams, failures) = parsedParams.partition {case Success(s) => true; case _ => false}
+    val (validParsedParams, failures) = parsedParams.partition { case Success(s) => true; case _ => false }
     failures.toList match {
       case x :: _ => x match {
         case Failure(error) => error.failure
       }
       case _ => try {
-        Validation.sequence(validParsedParams).flatMap( ps =>
-          statement.bind(ps: _*).success
-        )
+        val toBeBound = for {
+          validParam <- validParsedParams
+          value <- validParam.toOption
+        } yield value
+        statement.bind(toBeBound: _*).success
       } catch {
         case e: Exception => e.getMessage.failure
       }

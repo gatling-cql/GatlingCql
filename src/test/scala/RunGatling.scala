@@ -21,9 +21,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 import java.io.File
-
-import io.gatling.commons.util.PathHelper._
 import io.gatling.app.Gatling
+import io.gatling.commons.shared.unstable.util.PathHelper.RichPath
 import io.gatling.core.config.GatlingPropertiesBuilder
 
 /**

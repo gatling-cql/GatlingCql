@@ -46,7 +46,7 @@ case class CqlProtocol(session: CqlSession) extends Protocol {
 
 case class CqlComponents(coreComponents: CoreComponents, cqlProtocol: CqlProtocol) extends ProtocolComponents {
 
-  def onStart: Session => Session = ProtocolComponents.NoopOnStart
+  def onStart: Session => Session = Session.Identity
 
   def onExit: Session => Unit = ProtocolComponents.NoopOnExit
 }
