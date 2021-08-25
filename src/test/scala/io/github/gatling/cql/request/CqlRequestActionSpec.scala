@@ -22,13 +22,11 @@
  */
 package io.github.gatling.cql.request
 
-import java.util.concurrent.CompletionStage
-import akka.actor.ActorSystem
 import com.datastax.oss.driver.api.core.cql.{AsyncResultSet, SimpleStatement}
 import com.datastax.oss.driver.api.core.{ConsistencyLevel, CqlSession}
 import io.gatling.commons.stats.KO
 import io.gatling.commons.util.DefaultClock
-import io.gatling.commons.validation.{FailureWrapper, SuccessWrapper}
+import io.gatling.commons.validation._
 import io.gatling.core.CoreComponents
 import io.gatling.core.action.Action
 import io.gatling.core.config.GatlingConfiguration
@@ -36,21 +34,24 @@ import io.gatling.core.session.Session
 import io.gatling.core.stats.StatsEngine
 import io.github.gatling.cql.CqlStatement
 import io.github.gatling.cql.checks.CqlCheck
-import org.easymock.Capture
-import org.easymock.EasyMock.{anyObject, anyString, capture, reset, eq => eqAs}
-import org.scalatest._
+import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers.{any, anyLong, anyString, argThat, eq => eqAs}
+import org.mockito.BDDMockito._
+import org.mockito.Mockito._
+import org.mockito.internal.matchers.CapturingMatcher
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should._
-import org.scalatestplus.easymock.EasyMockSugar
+import org.scalatestplus.mockito.MockitoSugar
 
-class CqlRequestActionSpec extends AnyFlatSpec with EasyMockSugar with Matchers with BeforeAndAfter {
+import java.util.concurrent.CompletionStage
+
+class CqlRequestActionSpec extends AnyFlatSpec with MockitoSugar with Matchers {
   val config = GatlingConfiguration.loadForTest()
   val cassandraSession = mock[CqlSession]
   val statement = mock[CqlStatement]
-  val system = mock[ActorSystem]
   val statsEngine = mock[StatsEngine]
   val nextAction = mock[Action]
-  val coreComponents = new CoreComponents(system, null, null, None, statsEngine, new DefaultClock, null, config)
+  val coreComponents = new CoreComponents(null, null, null, None, statsEngine, new DefaultClock, null, config)
   val session = Session("scenario", 1, null)
 
   val target =
@@ -58,36 +59,36 @@ class CqlRequestActionSpec extends AnyFlatSpec with EasyMockSugar with Matchers 
       CqlComponents(coreComponents, CqlProtocol(cassandraSession)),
       CqlAttributes("test", statement, ConsistencyLevel.ANY, ConsistencyLevel.SERIAL, List.empty[CqlCheck]))
 
-  before {
-    reset(statement, cassandraSession, statsEngine)
-  }
-
   it should "fail if expression is invalid and return the error" in {
-    val errorMessageCapture = Capture.newInstance[Some[String]]()
-    expecting {
-      statement.apply(session).andReturn("OOPS".failure)
-      statsEngine.logResponse(eqAs(session.scenario), eqAs(session.groups), anyObject[String], anyObject[Long], anyObject[Long], eqAs(KO), eqAs(None), capture(errorMessageCapture))
-    }
+    //given
+    val errorMessageCapture: ArgumentCaptor[Option[String]] = ArgumentCaptor.forClass(classOf[Option[String]])
+    given(statement.apply(session)).willReturn("OOPS".failure)
 
-    whenExecuting(statement, statsEngine) {
-      target.execute(session)
-    }
+    //when
+    target.execute(session)
+
+    //then
+    `then`(statsEngine).should(times(1)).logResponse(eqAs(session.scenario), eqAs(session.groups), anyString(), anyLong(), anyLong(), eqAs(KO), eqAs(None), errorMessageCapture.capture())
     val captureErrorMessage = errorMessageCapture.getValue
-    captureErrorMessage.get should be("Error setting up statement: OOPS")
+    captureErrorMessage should contain("Error setting up statement: OOPS")
   }
 
-  it should "execute a valid statement" in {
-    val statementCapture = Capture.newInstance[SimpleStatement]()
-    expecting {
-      statement.apply(session).andReturn(SimpleStatement.newInstance("select * from test").success)
-      cassandraSession.executeAsync(capture(statementCapture)) andReturn mock[CompletionStage[AsyncResultSet]]
-    }
-    whenExecuting(statement, cassandraSession) {
-      target.execute(session)
-    }
-    val capturedStatement = statementCapture.getValue
+  it should "build and execute a valid statement" in {
+    //given
+    val capture = new CapturingMatcher[SimpleStatement]()
+    val result = mock[CompletionStage[AsyncResultSet]]
+    given(statement.apply(session)).willReturn(SimpleStatement.newInstance("select * from test").success)
+    given(cassandraSession.executeAsync(argThat(capture))).willReturn(result)
+
+    //when
+    target.execute(session)
+
+    //then
+    `then`(result).should(times(1)).whenCompleteAsync(any())
+    val capturedStatement = capture.getLastValue
     capturedStatement shouldBe a[SimpleStatement]
     capturedStatement.getConsistencyLevel shouldBe ConsistencyLevel.ANY
-    capturedStatement.getQuery should be("select * from test")
+    capturedStatement.getSerialConsistencyLevel shouldBe ConsistencyLevel.SERIAL
+    capturedStatement.getQuery shouldBe "select * from test"
   }
 }

@@ -25,42 +25,41 @@ package io.github.gatling.cql
 import com.datastax.oss.driver.api.core.cql.{BoundStatement, PreparedStatement}
 import io.gatling.commons.validation._
 import io.gatling.core.session.Session
-import io.gatling.core.session.el.ElCompiler
-import org.easymock.EasyMock._
-import org.scalatest.BeforeAndAfter
+import io.gatling.core.session.el._
+import org.mockito.BDDMockito._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should._
-import org.scalatestplus.easymock.EasyMockSugar
+import org.scalatestplus.mockito.MockitoSugar
 
-class PreparedCqlStatementSpec extends AnyFlatSpec with EasyMockSugar with Matchers with BeforeAndAfter {
-  val e1 = ElCompiler.compile[AnyRef]("${foo}")
-  val e2 = ElCompiler.compile[AnyRef]("${baz}")
+class PreparedCqlStatementSpec extends AnyFlatSpec with MockitoSugar with Matchers {
+  val e1 = "${foo}".el[AnyRef]
+  val e2 = "${baz}".el[AnyRef]
   val prepared = mock[PreparedStatement]
   val target = BoundCqlStatement(prepared, e1, e2)
 
-  before {
-    reset(prepared)
-  }
-
   "BoundCqlStatement" should "correctly bind values to a prepared statement" in {
+    //given
     val session = Session("name", 1, null).set("foo", Integer.valueOf(5)).set("baz", "BaZ")
-    expecting {
-      prepared.bind(Integer.valueOf(5), "BaZ").andReturn(mock[BoundStatement])
-    }
-    whenExecuting(prepared) {
-      target(session) shouldBe a[Success[_]]
-    }
+    given(prepared.bind(Integer.valueOf(5), "BaZ")).willReturn(mock[BoundStatement])
+
+    //then
+    target(session) shouldBe a[Success[_]]
   }
 
   it should "fail if the expression is wrong and return the 1st error" in {
+    //given
     val session = Session("name", 1, null).set("fu", Integer.valueOf(5)).set("buz", "BaZ")
+
+    //then
     target(session) shouldBe "No attribute named 'foo' is defined".failure
   }
 
   it should "handle null parameters correctly" in {
+    //given
     val session = Session("name", 1, null)
     val statementWithNull = BoundCqlStatement(prepared, null)
 
+    //then
     statementWithNull(session) shouldBe a[Success[_]]
   }
 }

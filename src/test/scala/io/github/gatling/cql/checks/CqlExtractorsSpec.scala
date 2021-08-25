@@ -27,15 +27,14 @@ import io.gatling.commons.validation.Validation.NoneSuccess
 import io.gatling.commons.validation._
 import io.github.gatling.cql.checks.CqlExtractors._
 import io.github.gatling.cql.response.CqlResponse
-import org.easymock.EasyMock.reset
-import org.scalatest._
+import org.mockito.BDDMockito._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should._
-import org.scalatestplus.easymock.EasyMockSugar
+import org.scalatestplus.mockito.MockitoSugar
 
 import scala.jdk.CollectionConverters._
 
-class CqlExtractorsSpec extends AnyFlatSpec with EasyMockSugar with Matchers with BeforeAndAfter {
+class CqlExtractorsSpec extends AnyFlatSpec with MockitoSugar with Matchers {
 
   val rs: ResultSet = mock[ResultSet]
   val ei: ExecutionInfo = mock[ExecutionInfo]
@@ -43,26 +42,18 @@ class CqlExtractorsSpec extends AnyFlatSpec with EasyMockSugar with Matchers wit
   val rows = List(1, 2, 3, 4, 5)
   val column = "foo"
 
-  before {
-    reset(rs, target)
-  }
-
   "ExecutionInfoExtractor" should "correctly extract ExecutionInfo" in {
-    expecting {
-      rs.getExecutionInfo.andReturn(ei)
-    }
-    whenExecuting(rs) {
-      ExecutionInfoExtractor(CqlResponse(rs)) shouldBe Some(ei).success
-    }
+    given(rs.getExecutionInfo).willReturn(ei)
+
+    //then
+    ExecutionInfoExtractor(CqlResponse(rs)) shouldBe Some(ei).success
   }
 
   "RowCountExtractor" should "correctly extract RowCount" in {
-    expecting {
-      rs.all().andReturn(List(mock[Row]).asJava)
-    }
-    whenExecuting(rs) {
-      RowCountExtractor(CqlResponse(rs)) shouldBe Some(1).success
-    }
+    given(rs.all()).willReturn(List(mock[Row]).asJava)
+
+    //then
+    RowCountExtractor(CqlResponse(rs)) shouldBe Some(1).success
   }
 
   "ResultSetExtractor" should "correctly extract ResultSet" in {
@@ -70,56 +61,44 @@ class CqlExtractorsSpec extends AnyFlatSpec with EasyMockSugar with Matchers wit
   }
 
   "singleRecordExtractor" should "correctly extract a single record" in {
-    expecting {
-      target.column(column).andReturn(rows)
-    }
-    whenExecuting(target) {
-      singleRecordExtractor(column, 3)(target) shouldBe Some(rows(3)).success
-    }
+    given(target.column(column)).willReturn(rows)
+
+    //then
+    singleRecordExtractor(column, 3)(target) shouldBe Some(rows(3)).success
   }
 
   "allRecordsExtractor" should "correctly return all records" in {
-    expecting {
-      target.column(column).andReturn(rows)
-    }
-    whenExecuting(target) {
-      allRecordsExtractor(column)(target) shouldBe Some(rows).success
-    }
+    given(target.column(column)).willReturn(rows)
+
+    //then
+    allRecordsExtractor(column)(target) shouldBe Some(rows).success
   }
 
   "countRecordsExtractor" should "correctly extract a count of records" in {
-    expecting {
-      target.column(column).andReturn(rows)
-    }
-    whenExecuting(target) {
-      countRecordsExtractor(column)(target) shouldBe Some(rows.length).success
-    }
+    given(target.column(column)).willReturn(rows)
+
+    //then
+    countRecordsExtractor(column)(target) shouldBe Some(rows.length).success
   }
 
   "singleColumnValueExtractor" should "not fail if a column is not in the result" in {
-    expecting {
-      target.column(column).andReturn(Nil)
-    }
-    whenExecuting(target) {
-      singleRecordExtractor(column, 3)(target) shouldBe NoneSuccess
-    }
+    given(target.column(column)).willReturn(Nil)
+
+    //then
+    singleRecordExtractor(column, 3)(target) shouldBe NoneSuccess
   }
 
   "allRecordsExtractor" should "not fail if a column is not in the result" in {
-    expecting {
-      target.column(column).andReturn(Nil)
-    }
-    whenExecuting(target) {
-      allRecordsExtractor(column)(target) shouldBe NoneSuccess
-    }
+    given(target.column(column)).willReturn(Nil)
+
+    //then
+    allRecordsExtractor(column)(target) shouldBe NoneSuccess
   }
 
   "countRecordsExtractor" should "not fail if a column is not in the result" in {
-    expecting {
-      target.column(column).andReturn(Nil)
-    }
-    whenExecuting(target) {
-      countRecordsExtractor(column)(target) shouldBe NoneSuccess
-    }
+    given(target.column(column)).willReturn(Nil)
+
+    //then
+    countRecordsExtractor(column)(target) shouldBe NoneSuccess
   }
 }
