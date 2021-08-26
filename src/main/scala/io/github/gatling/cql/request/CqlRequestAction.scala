@@ -30,7 +30,7 @@ import io.gatling.core.session.Session
 import io.gatling.core.stats.StatsEngine
 import io.github.gatling.cql.response.CqlResponseHandler
 
-class CqlRequestAction(val name: String, val next: Action, components: CqlComponents, attr: CqlAttributes) extends ExitableAction {
+class CqlRequestAction(val name: String, val next: Action, components: CqlComponents, attr: CqlAttributes) extends ExitableAction { //TODO: Reimplement as Request action?
 
   override def execute(session: Session): Unit = {
     val stmt = attr.statement(session)
