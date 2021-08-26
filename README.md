@@ -68,7 +68,7 @@ class CassandraSimulation extends Simulation {
         .consistencyLevel(ConsistencyLevel.ANY)) 
   }
 
-  setUp(scn.inject(rampUsersPerSec(10) to 100 during (30 seconds)))
+  setUp(scn.inject(rampUsersPerSec(10) to 100 during (30.seconds)))
     .protocols(cqlConfig)
 
   after(session.close())
