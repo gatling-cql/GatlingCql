@@ -74,13 +74,13 @@
         <testSourceDirectory>src/test/scala</testSourceDirectory>
         <plugins>
             <plugin>
-                <!-- see http://davidb.github.com/scala-maven-plugin -->
+                <!-- see https://davidb.github.io/scala-maven-plugin -->
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
                 <version>4.5.3</version>
                 <configuration>
                     <args>
-                        <arg>-target:jvm-1.8</arg>
+                        <arg>-target:8</arg>
                         <arg>-deprecation</arg>
                         <arg>-feature</arg>
                         <arg>-unchecked</arg>
