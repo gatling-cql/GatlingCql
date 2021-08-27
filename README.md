@@ -1,4 +1,4 @@
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.gatling-cql/gatling-cql/badge.svg)](https://search.maven.org/artifact/io.github.gatling-cql/gatling-cql) ![Deploy Snapshot](https://github.com/gatling-cql/GatlingCql/workflows/Deploy%20Snapshot/badge.svg)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.gatling-cql/gatling-cql/badge.svg?style=flat-square)](https://search.maven.org/artifact/io.github.gatling-cql/gatling-cql) [![Deploy Snapshot](https://github.com/gatling-cql/GatlingCql/actions/workflows/maven_deploy.yml/badge.svg)](https://github.com/gatling-cql/GatlingCql/actions/workflows/maven_deploy.yml)
 
 # GatlingCql
 
