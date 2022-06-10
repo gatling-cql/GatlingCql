@@ -30,13 +30,13 @@ trait CqlCheckType
 
 trait CqlCheckSupport {
 
-  implicit def checkBuilder2CqlCheck[A, P, X](checkBuilder: CheckBuilder[A, P, X])(implicit materializer: CheckMaterializer[A, CqlCheck, CqlResponse, P]): CqlCheck =
+  implicit def checkBuilder2CqlCheck[A, P](checkBuilder: CheckBuilder[A, P])(implicit materializer: CheckMaterializer[A, CqlCheck, CqlResponse, P]): CqlCheck =
     checkBuilder.build(materializer)
 
-  implicit def validatorCheckBuilder2CqlCheck[A, P, X](validatorCheckBuilder: ValidatorCheckBuilder[A, P, X])(implicit CheckMaterializer: CheckMaterializer[A, CqlCheck, CqlResponse, P]): CqlCheck =
+  implicit def validatorCheckBuilder2CqlCheck[A, P, X](validatorCheckBuilder: CheckBuilder.Validate.Default[A, P, X])(implicit CheckMaterializer: CheckMaterializer[A, CqlCheck, CqlResponse, P]): CqlCheck =
     validatorCheckBuilder.exists
 
-  implicit def findCheckBuilder2CqlCheck[A, P, X](findCheckBuilder: FindCheckBuilder[A, P, X])(implicit CheckMaterializer: CheckMaterializer[A, CqlCheck, CqlResponse, P]): CqlCheck =
+  implicit def findCheckBuilder2CqlCheck[A, P, X](findCheckBuilder: CheckBuilder.Find.Default[A, P, X])(implicit CheckMaterializer: CheckMaterializer[A, CqlCheck, CqlResponse, P]): CqlCheck =
     findCheckBuilder.find.exists
 
   implicit val cqlCheckMaterializer = new CheckMaterializer[CqlCheckType, CqlCheck, CqlResponse, CqlResponse](identity) {

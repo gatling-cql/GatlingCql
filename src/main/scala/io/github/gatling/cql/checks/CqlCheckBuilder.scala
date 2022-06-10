@@ -22,16 +22,15 @@
  */
 package io.github.gatling.cql.checks
 
-import java.util
-
 import com.datastax.oss.driver.api.core.cql.{ExecutionInfo, ResultSet}
 import io.gatling.commons.validation._
+import io.gatling.core.check.Check.PreparedCache
 import io.gatling.core.check._
 import io.gatling.core.session._
 import io.github.gatling.cql.checks.CqlExtractors._
 import io.github.gatling.cql.response.CqlResponse
 
-class CqlCheckBuilder[X](extractor: Expression[CqlExtractor[X]]) extends DefaultFindCheckBuilder[CqlCheckType, CqlResponse, X](extractor, displayActualValue = true) {
+class CqlCheckBuilder[X](extractor: Expression[CqlExtractor[X]]) extends CheckBuilder.Find.Default[CqlCheckType, CqlResponse, X](extractor, displayActualValue = true) {
 
   /**
    * Allow to define any condition for a given [[io.github.gatling.cql.checks#CqlCheck CqlCheck]]
@@ -58,19 +57,22 @@ object CqlCheckBuilder {
   val Applied = new CqlCheckBuilder[Boolean](AppliedExtractor.expressionSuccess)
   val Exhausted = new CqlCheckBuilder[Boolean](ExhaustedExtractor.expressionSuccess)
 
-  def columnValue(columnName: Expression[String]) = new DefaultMultipleFindCheckBuilder[CqlCheckType, CqlResponse, Any](true) {
-      override def findExtractor(occurrence: Int) = columnName.map(singleRecordExtractor(_, occurrence))
+  def columnValue(columnName: Expression[String]) = new CheckBuilder.MultipleFind.Default[CqlCheckType, CqlResponse, Any](true) {
+    override def findExtractor(occurrence: Int) = columnName.map(singleRecordExtractor(_, occurrence))
 
-      override def findAllExtractor = columnName.map(allRecordsExtractor)
+    override def findAllExtractor = columnName.map(allRecordsExtractor)
 
-      override def countExtractor = columnName.map(countRecordsExtractor)
-    }
-
-  def simpleCheck(predicate: ResultSet => Boolean): CqlCheck = new CqlCheck {
-    override def check(response: CqlResponse, session: Session, preparedCache: util.Map[Any, Any]): Validation[CheckResult] = {
-      if (predicate(response.resultSet)) CheckResult.NoopCheckResultSuccess
-      else "CQL check failed".failure
-    }
+    override def countExtractor = columnName.map(countRecordsExtractor)
   }
+
+  def simpleCheck(predicate: ResultSet => Boolean): CqlCheck = Check.Simple(
+    (response: CqlResponse, _: Session, _: PreparedCache) =>
+      if (predicate(response.resultSet)) {
+        CheckResult.NoopCheckResultSuccess
+      } else {
+        "CQL check failed".failure
+      },
+    None
+  )
 }
 
