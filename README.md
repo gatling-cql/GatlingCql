@@ -80,12 +80,12 @@ class CassandraSimulation extends Simulation {
 ### For the `gatling-charts-highcharts-bundle` setup
 
 * Get a release TGZ from the [Maven Central](https://repo1.maven.org/maven2/io/github/gatling-cql/gatling-cql/)
-* Unpack into Gatling folder: `tar -xjf gatling-cql-3.6.1-1-bundle.tar.gz -C gatling-charts-highcharts-bundle-3.6.1/`
+* Unpack into Gatling folder: `tar -xjf gatling-cql-3.7.6-1-bundle.tar.gz -C gatling-charts-highcharts-bundle-3.7.6/`
 * Run Gatling and you should see `cassandra.CassandraSimulation` in your simulations list
 
 ### As a library for your project
 
-Include `gatling-cql` as a dependency to your project. See the [Maven Central Page](https://search.maven.org/artifact/io.github.gatling-cql/gatling-cql/3.6.1-1/jar) for more information for you build tool.
+Include `gatling-cql` as a dependency to your project. See the [Maven Central Page](https://search.maven.org/artifact/io.github.gatling-cql/gatling-cql/3.7.6-1/jar) for more information for you build tool.
 
 #### Maven Example
 
@@ -96,7 +96,7 @@ You can run your simulations as a part of your build/CI process. See the [Gatlin
         <dependency>
             <groupId>io.github.gatling-cql</groupId>
             <artifactId>gatling-cql</artifactId>
-            <version>3.6.1-1</version>
+            <version>3.7.6-1</version>
         </dependency>
     </dependencies>
 ```
