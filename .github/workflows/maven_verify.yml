@@ -21,13 +21,7 @@ jobs:
       with:
         java-version: ${{ matrix.java }}
         distribution: 'temurin'
-
-    - name: Cache Maven packages
-      uses: actions/cache@v3
-      with:
-        path: ~/.m2/repository
-        key: ${{ env.JAVA_HOME }}-m2-${{ hashFiles('**/pom.xml') }}-${{ secrets.OSSRH_TOKEN }}
-        restore-keys: ${{ env.JAVA_HOME }}-m2-${{ hashFiles('**/pom.xml') }}
+        cache: 'maven'
 
     - name: Maven Verify
       run: mvn -B clean verify
