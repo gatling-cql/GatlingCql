@@ -77,10 +77,10 @@
                 <!-- see https://davidb.github.io/scala-maven-plugin -->
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
-                <version>4.6.2</version>
+                <version>4.8.0</version>
                 <configuration>
                     <args>
-                        <arg>-target:8</arg>
+                        <arg>-release:8</arg>
                         <arg>-deprecation</arg>
                         <arg>-feature</arg>
                         <arg>-unchecked</arg>
@@ -132,7 +132,6 @@
                 <artifactId>gatling-maven-plugin</artifactId>
                 <version>${gatling.maven-plugin.version}</version>
                 <configuration>
-                    <disableCompiler>true</disableCompiler>
                     <simulationClass>io.github.gatling.cql.CheckCompileTest</simulationClass>
                 </configuration>
             </plugin>
