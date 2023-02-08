@@ -22,7 +22,6 @@
  */
 import java.io.File
 import io.gatling.app.Gatling
-import io.gatling.commons.shared.unstable.util.PathHelper.RichPath
 import io.gatling.core.config.GatlingPropertiesBuilder
 
 /**
@@ -32,10 +31,10 @@ object RunGatling extends App
 {
   val projectRootDir = new File(".").toPath
 
-  val mavenResourcesDirectory = projectRootDir / "src" / "test" / "resources"
-  val mavenTargetDirectory = projectRootDir / "target"
-  val mavenBinariesDirectory = mavenTargetDirectory / "test-classes"
-  val resultsDirectory = mavenTargetDirectory / "results"
+  val mavenResourcesDirectory = projectRootDir.resolve("src").resolve( "test").resolve( "resources")
+  val mavenTargetDirectory = projectRootDir.resolve("target")
+  val mavenBinariesDirectory = mavenTargetDirectory.resolve("test-classes")
+  val resultsDirectory = mavenTargetDirectory.resolve("results")
 
   val props = new GatlingPropertiesBuilder
 

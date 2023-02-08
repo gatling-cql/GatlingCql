@@ -13,8 +13,8 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <encoding>UTF-8</encoding>
         <scala.version>2.13.9</scala.version>
-        <gatling.version>3.8.3</gatling.version>
-        <gatling.maven-plugin.version>4.2.0</gatling.maven-plugin.version>
+        <gatling.version>3.9.0</gatling.version>
+        <gatling.maven-plugin.version>4.2.9</gatling.maven-plugin.version>
         <cassandra-driver.version>4.14.1</cassandra-driver.version>
     </properties>
 
